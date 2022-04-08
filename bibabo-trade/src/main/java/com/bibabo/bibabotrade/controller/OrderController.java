@@ -1,10 +1,13 @@
 package com.bibabo.bibabotrade.controller;
 
+import com.alibaba.nacos.shaded.org.checkerframework.checker.units.qual.A;
 import com.bibabo.bibabotrade.message.sender.MessageSenderService;
 import com.bibabo.bibabotrade.model.ao.OrderAO;
 import com.bibabo.bibabotrade.model.bo.TransactionalMessageBO;
 import com.bibabo.bibabotrade.model.dto.CreateOrderMessageDTO;
 import com.bibabo.bibabotrade.model.vo.CreateOrderVO;
+import com.bibabo.bibabotrade.services.CreateOrderServiceI;
+import com.bibabo.order.dto.OrderModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -26,11 +30,14 @@ import java.util.concurrent.atomic.AtomicLong;
 @Slf4j
 public class OrderController {
 
+    // TODO 集成redis incr生成订单号
     private static final AtomicLong ORDER_ID = new AtomicLong(1);
 
+    @Autowired
+    private CreateOrderServiceI createOrderService;
 
     @Autowired
-    MessageSenderService messageSender;
+    private MessageSenderService messageSender;
 
     @PostMapping("/order")
     public CreateOrderVO createOrder(@RequestBody OrderAO orderAO) {
@@ -59,7 +66,12 @@ public class OrderController {
     }
 
     @GetMapping("/order")
-    public String listOrderByOrderIds(@RequestParam List<Long> orderIds) {
-        return null;
+    public List<OrderModel> listOrderByOrderIds(@RequestParam List<Long> orderIds) {
+        List<OrderModel> orderModelList = new ArrayList<>(orderIds.size());
+        orderIds.forEach(orderId -> {
+            OrderModel orderModel = createOrderService.queryOrderById(orderId);
+            orderModelList.add(orderModel);
+        });
+        return orderModelList;
     }
 }
