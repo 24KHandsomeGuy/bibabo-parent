@@ -1,16 +1,17 @@
-package com.bibabo.order.dto;
+package com.bibabo.bibabotrade.model.vo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
- * @Author: Damon Fu
- * @Date: 2022/3/20 19:21
- * @Description:
+ * @author fukuixiang
+ * @date 2022/4/7
+ * @time 17:13
+ * @description
  */
 @Data
 @AllArgsConstructor
-public class OrderResponseDTO extends BaseDTO {
+public class CreateOrderVO {
 
     private Boolean success;
 

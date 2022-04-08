@@ -1,5 +1,6 @@
 package com.bibabo.order.services;
 
+import com.bibabo.order.dto.OrderModel;
 import com.bibabo.order.dto.OrderRequestDTO;
 import com.bibabo.order.dto.OrderResponseDTO;
 
@@ -11,4 +12,6 @@ import com.bibabo.order.dto.OrderResponseDTO;
 public interface OrderServiceI {
 
     OrderResponseDTO createOrder(OrderRequestDTO dto);
+
+    OrderModel queryOrderById(long orderId);
 }
