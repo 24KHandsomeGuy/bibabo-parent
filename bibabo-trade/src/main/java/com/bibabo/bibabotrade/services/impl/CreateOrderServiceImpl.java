@@ -26,7 +26,7 @@ import java.util.List;
 @Service
 public class CreateOrderServiceImpl implements CreateOrderServiceI {
 
-    @DubboReference(check = false)
+    @DubboReference(check = false, timeout = 60 * 1000)
     private com.bibabo.order.services.OrderServiceI orderService;
 
 

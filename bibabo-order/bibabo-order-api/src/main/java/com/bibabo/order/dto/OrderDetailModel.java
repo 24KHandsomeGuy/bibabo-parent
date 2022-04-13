@@ -37,4 +37,9 @@ public class OrderDetailModel extends BaseDTO {
      * 商品价
      */
     private BigDecimal skuPrice;
+
+    /**
+     * 商品类型 1：普通品 2：虚拟组套 3.虚拟组套子商品
+     */
+    private Short skuType;
 }

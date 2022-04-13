@@ -7,6 +7,7 @@ import com.bibabo.bibabotrade.model.bo.TransactionalMessageBO;
 import com.bibabo.bibabotrade.model.dto.CreateOrderMessageDTO;
 import com.bibabo.bibabotrade.model.vo.CreateOrderVO;
 import com.bibabo.bibabotrade.services.CreateOrderServiceI;
+import com.bibabo.bibabotrade.utils.NumberGenerator;
 import com.bibabo.order.dto.OrderModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +31,8 @@ import java.util.concurrent.atomic.AtomicLong;
 @Slf4j
 public class OrderController {
 
-    // TODO 集成redis incr生成订单号
-    private static final AtomicLong ORDER_ID = new AtomicLong(1);
+    @Autowired
+    private NumberGenerator numberGenerator;
 
     @Autowired
     private CreateOrderServiceI createOrderService;
@@ -46,7 +47,7 @@ public class OrderController {
         CreateOrderVO vo = new CreateOrderVO(false, null);
         // 组装创建订单业务DTO。获取订单号、填充时间
         Date now = new Date();
-        Long orderId = ORDER_ID.getAndIncrement();
+        long orderId = numberGenerator.generateOrderId();
         orderAO.setOrderId(orderId);
         orderAO.setCreateDate(now);
         // 业务逻辑执行BO
