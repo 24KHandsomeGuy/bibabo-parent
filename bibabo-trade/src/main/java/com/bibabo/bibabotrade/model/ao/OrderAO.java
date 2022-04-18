@@ -1,8 +1,10 @@
 package com.bibabo.bibabotrade.model.ao;
 
+import com.bibabo.bibabotrade.model.dto.MessageDTO;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -12,24 +14,29 @@ import java.util.List;
  */
 @Data
 @NoArgsConstructor
-public class OrderAO {
+public class OrderAO extends MessageDTO {
 
     private List<OrderDetailAO> orderDetailAOList;
+
+    private Long orderId;
 
     /**
      * 顾客id 用户系统主键
      */
     private String custId;
 
+
+    private Date createDate;
+
+    /**
+     * 顾客电话
+     */
+    private String custTelephone;
+
     /**
      * 期望收货日期
      *//*
     private Date bookDate;
-
-    *//**
-     * 顾客电话
-     *//*
-    private String custTelephone;
 
     *//**
      * 收货省

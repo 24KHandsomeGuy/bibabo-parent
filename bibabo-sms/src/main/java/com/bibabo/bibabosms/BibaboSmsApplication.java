@@ -1,16 +1,15 @@
-package com.bibabo.bibabotrade;
+package com.bibabo.bibabosms;
 
-
-import com.bibabo.bibabotrade.message.channel.SmsSource;
+import com.bibabo.bibabosms.channel.SmsSink;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 
 @SpringBootApplication
-@EnableBinding({SmsSource.class})
-public class BibaboTradeApplication {
+@EnableBinding(SmsSink.class)
+public class BibaboSmsApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(BibaboTradeApplication.class, args);
+        SpringApplication.run(BibaboSmsApplication.class, args);
     }
 }
