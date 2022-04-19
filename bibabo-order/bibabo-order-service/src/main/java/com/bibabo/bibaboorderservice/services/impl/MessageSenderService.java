@@ -1,8 +1,7 @@
-package com.bibabo.bibabotrade.message.sender;
+package com.bibabo.bibaboorderservice.services.impl;
 
-import com.alibaba.cloud.stream.binder.rocketmq.constant.RocketMQConst;
-import com.bibabo.bibabotrade.message.channel.OrderSource;
-import com.bibabo.bibabotrade.model.bo.TransactionalMessageBO;
+import com.bibabo.bibaboorderservice.channel.SmsSource;
+import com.bibabo.order.dto.OrderModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
@@ -22,21 +21,18 @@ import org.springframework.util.MimeTypeUtils;
 public class MessageSenderService {
 
     @Autowired
-    private OrderSource createOrderSource;
+    private SmsSource smsSource;
 
     /**
-     * 发送创建订单事务消息
+     * 发送创建订单短信消息
      *
      * @param msg
-     * @param bo
      * @param <T>
      * @return
      */
-    public <T> boolean sendCreateOrderTransactionalMsg(Long msg, TransactionalMessageBO<T> bo) {
+    public <T> boolean sendCreateOrder2SmsMsg(OrderModel msg) {
         MessageBuilder builder = MessageBuilder.withPayload(msg).setHeader(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON);
-        // 事务obj key
-        builder.setHeader(RocketMQConst.USER_TRANSACTIONAL_ARGS, bo);
         Message message = builder.build();
-        return createOrderSource.outputCreateOrder().send(message);
+        return smsSource.outputCreateOrder2Sms().send(message);
     }
 }

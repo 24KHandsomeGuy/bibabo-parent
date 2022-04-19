@@ -30,4 +30,9 @@ public class OrderModel extends BaseDTO {
      * 顾客电话
      */
     private String custTelephone;
+
+    /**
+     * 顾客地址
+     */
+    private String address;
 }

@@ -1,13 +1,13 @@
 package com.bibabo.bibabotrade;
 
 
-import com.bibabo.bibabotrade.message.channel.SmsSource;
+import com.bibabo.bibabotrade.message.channel.OrderSource;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 
 @SpringBootApplication
-@EnableBinding({SmsSource.class})
+@EnableBinding({OrderSource.class})
 public class BibaboTradeApplication {
 
     public static void main(String[] args) {

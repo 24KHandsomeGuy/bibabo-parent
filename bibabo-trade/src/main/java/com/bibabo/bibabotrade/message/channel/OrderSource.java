@@ -9,8 +9,8 @@ import org.springframework.messaging.MessageChannel;
  * @time 16:17
  * @description
  */
-public interface SmsSource {
+public interface OrderSource {
 
-    @Output("outputCreateOrder2Sms")
-    MessageChannel outputCreateOrder2Sms();
+    @Output("outputCreateOrder")
+    MessageChannel outputCreateOrder();
 }

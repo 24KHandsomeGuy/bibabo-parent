@@ -1,6 +1,5 @@
 package com.bibabo.bibabotrade.controller;
 
-import com.alibaba.nacos.shaded.org.checkerframework.checker.units.qual.A;
 import com.bibabo.bibabotrade.message.sender.MessageSenderService;
 import com.bibabo.bibabotrade.model.ao.OrderAO;
 import com.bibabo.bibabotrade.model.bo.TransactionalMessageBO;
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @Author: Damon Fu
@@ -54,10 +52,8 @@ public class OrderController {
         TransactionalMessageBO<CreateOrderVO> bo = new TransactionalMessageBO();
         bo.setMessageDTO(orderAO);
 
-        // 组装发送短信消息DTO
-        CreateOrderMessageDTO messageDTO = CreateOrderMessageDTO.builder().createDate(now).custTelephone(orderAO.getCustTelephone()).orderId(orderId).build();
         // 发送事务消息并回调执行本地事务处理
-        boolean rst = messageSender.sendCreateOrderSmsTransactionalMsg(messageDTO, bo);
+        boolean rst = messageSender.sendCreateOrderTransactionalMsg(orderId, bo);
         if (rst) {
             vo = bo.getResult();
         }
