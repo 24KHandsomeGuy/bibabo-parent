@@ -3,6 +3,7 @@ package com.bibabo.bibabotrade.model.dto;
 import lombok.Builder;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -13,7 +14,7 @@ import java.util.Date;
  */
 @Builder
 @Data
-public class CreateOrderMessageDTO {
+public class CreateOrderMessageDTO implements Serializable {
 
     private Long orderId;
 

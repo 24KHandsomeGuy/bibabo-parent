@@ -15,6 +15,7 @@
         <module>bibabo-order</module>
         <module>bibabo-sms</module>
         <module>bibabo-common-util</module>
+        <module>bibabo-gateway</module>
     </modules>
 
     <properties>

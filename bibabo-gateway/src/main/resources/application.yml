@@ -1,0 +1,38 @@
+server:
+  port: ${random.int[9091,9099]}
+
+spring:
+  application:
+    name: bibabo-gateway
+
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 114.116.44.130:8848
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lowerCaseServiceId: true
+      routes:
+        - id: order
+          serviceId: bibabo-trade
+          uri: http://localhost:8096/order
+          predicates:
+            - Path=/order/**
+          #filters:
+           # - StripPrefix=1
+        #- id: consumer
+        #  uri: lb://consumer
+        #  predicates:
+        #    - Path=/consumer/**
+        #  filters:
+        #    - StripPrefix=1
+    #sentinel:
+      #transport:
+        #port: 15000
+        #dashboard: localhost:8748
+
+
+  main:
+    allow-bean-definition-overriding: true
