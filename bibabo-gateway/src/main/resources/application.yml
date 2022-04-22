@@ -35,7 +35,15 @@ spring:
       transport:
         port: 15000
         dashboard: localhost:8748
-
+      datasource.ds1.file:
+        file: "classpath: gateway_order.json"
+        ruleType: gw-flow
+      scg.fallback:
+        mode: response
+        response-status: 444
+        response-body: 1234
+      scg:
+        order: -100
 
   main:
     allow-bean-definition-overriding: true
