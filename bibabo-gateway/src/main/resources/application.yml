@@ -15,23 +15,26 @@ spring:
           enabled: true
           lowerCaseServiceId: true
       routes:
-        - id: order
-          serviceId: bibabo-trade
-          uri: http://localhost:8096/order
-          predicates:
-            - Path=/order/**
-          #filters:
-           # - StripPrefix=1
-        #- id: consumer
-        #  uri: lb://consumer
+        #- id: order
+        #  uri: http://localhost:8096/order
         #  predicates:
-        #    - Path=/consumer/**
+        #    - Path=/order/**
         #  filters:
         #    - StripPrefix=1
-    #sentinel:
-      #transport:
-        #port: 15000
-        #dashboard: localhost:8748
+        - id: order
+          uri: lb://bibabo-trade
+          predicates:
+            - Path=/order/**
+
+      #超时
+      httpclient:
+        connect-timeout: 1000
+        response-timeout: 5s
+
+    sentinel:
+      transport:
+        port: 15000
+        dashboard: localhost:8748
 
 
   main:

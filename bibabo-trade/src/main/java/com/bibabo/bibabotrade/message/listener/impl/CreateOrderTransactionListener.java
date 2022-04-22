@@ -3,13 +3,9 @@ package com.bibabo.bibabotrade.message.listener.impl;
 import com.bibabo.bibabotrade.message.listener.AbstractTransactionListener;
 import com.bibabo.bibabotrade.model.ao.OrderAO;
 import com.bibabo.bibabotrade.model.bo.TransactionalMessageBO;
-import com.bibabo.bibabotrade.model.dto.CreateOrderMessageDTO;
 import com.bibabo.bibabotrade.model.vo.CreateOrderVO;
 import com.bibabo.bibabotrade.services.CreateOrderServiceI;
 import com.bibabo.order.dto.OrderModel;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.producer.LocalTransactionState;
 import org.apache.rocketmq.common.message.MessageExt;
@@ -46,19 +42,23 @@ public class CreateOrderTransactionListener extends AbstractTransactionListener 
 
     @Override
     public LocalTransactionState checkLocalTransaction(MessageExt messageExt) {
-        ObjectMapper objectMapper = new ObjectMapper();
         try {
-            CreateOrderMessageDTO dto = objectMapper.readValue(new String(messageExt.getBody()), new TypeReference<CreateOrderMessageDTO>() {
-            });
-            OrderModel orderModel = createOrderService.queryOrderById(dto.getOrderId());
+            long orderId = Long.parseLong(new String(messageExt.getBody()));
+            OrderModel orderModel = createOrderService.queryOrderById(orderId);
             if (orderModel != null) {
                 return LocalTransactionState.COMMIT_MESSAGE;
             }
-            return LocalTransactionState.COMMIT_MESSAGE;
+            return LocalTransactionState.ROLLBACK_MESSAGE;
+        } catch (RuntimeException e) {
+            return LocalTransactionState.UNKNOW;
+        }
+        /*try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            CreateOrderMessageDTO dto = objectMapper.readValue(new String(messageExt.getBody()), new TypeReference<CreateOrderMessageDTO>() {
+            });
+
         } catch (JsonProcessingException e) {
             e.printStackTrace();
-        }
-
-        return LocalTransactionState.UNKNOW;
+        }*/
     }
 }
