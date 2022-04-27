@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: bibabo-order-service
+  cloud:
+    nacos:
+      config:
+        server-addr: http://114.116.44.130:8848
+        shared-configs:
+          - data-id: ${spring.application.name}.yml
+            refresh: true
+      username: nacos
+      password: nacos

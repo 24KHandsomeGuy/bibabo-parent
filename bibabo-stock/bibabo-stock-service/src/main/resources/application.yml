@@ -7,9 +7,10 @@ spring:
     nacos:
       discovery:
         namespace: public
-        password: nacos
         server-addr: 114.116.44.130:8848
-        username: nacos
+      username: nacos
+      password: nacos
+
     sentinel:
       ## 公司内网，sentinel控制台无法访问推送
       transport:

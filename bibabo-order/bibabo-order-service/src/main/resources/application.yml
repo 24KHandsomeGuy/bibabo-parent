@@ -1,15 +1,12 @@
 spring:
-  application:
-    name: bibabo-order-service
   main:
     allow-bean-definition-overriding: true
   cloud:
     nacos:
       discovery:
         namespace: public
-        password: nacos
         server-addr: 114.116.44.130:8848
-        username: nacos
+
     stream:
       bindings:
         inputCreateOrder:
@@ -68,3 +65,5 @@ logging:
           stream:
             binder:
               rocketmq: DEBUG
+          nacos:
+            client: debug

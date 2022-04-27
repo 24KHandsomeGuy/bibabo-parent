@@ -7,7 +7,9 @@ import com.bibabo.order.dto.OrderResponseDTO;
 import com.bibabo.order.services.OrderServiceI;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.factory.annotation.Value;
 
+import javax.annotation.PostConstruct;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -20,6 +22,14 @@ import java.util.concurrent.ConcurrentHashMap;
 public class OrderServiceImpl implements OrderServiceI {
 
     public static final ConcurrentHashMap<Long, OrderModel> ORDER_CONTAINER = new ConcurrentHashMap<>();
+
+    @Value("${nacos.name}")
+    private String name;
+
+    @PostConstruct
+    public void init() {
+        log.info("");
+    }
 
     @Override
     @SentinelResource(value = "flow-create-order", fallback = "createOrderFallBack")
