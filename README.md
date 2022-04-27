@@ -23,3 +23,6 @@ dubbo+sentinel+nacos配置中心动态刷新sentinel规则配置
 
 ### 2022-04-27
 新建stock微服务
+
+### 2022-04-27
+nacos配置中心集成完毕
