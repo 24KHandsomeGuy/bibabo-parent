@@ -16,4 +16,6 @@ public class CreateOrderVO {
     private Boolean success;
 
     private Long orderId;
+
+    private String errorMsg;
 }

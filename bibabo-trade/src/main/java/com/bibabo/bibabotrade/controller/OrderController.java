@@ -42,7 +42,7 @@ public class OrderController {
     public CreateOrderVO createOrder(@RequestBody OrderAO orderAO) {
         log.info("交易系统接收前端下单请求参数：{} ", orderAO);
 
-        CreateOrderVO vo = new CreateOrderVO(false, null);
+        CreateOrderVO vo = new CreateOrderVO(false, null, "创建失败");
         // 组装创建订单业务DTO。获取订单号、填充时间
         Date now = new Date();
         long orderId = numberGenerator.generateOrderId();

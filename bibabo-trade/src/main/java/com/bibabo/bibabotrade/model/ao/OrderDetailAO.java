@@ -40,4 +40,6 @@ public class OrderDetailAO implements Serializable {
      *//*
     @NotNull
     private BigDecimal salePirce;*/
+
+    private Integer wareId;
 }
