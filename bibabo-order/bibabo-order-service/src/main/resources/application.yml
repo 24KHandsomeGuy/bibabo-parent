@@ -1,0 +1,70 @@
+spring:
+  application:
+    name: bibabo-order-service
+  main:
+    allow-bean-definition-overriding: true
+  cloud:
+    nacos:
+      discovery:
+        namespace: public
+        password: nacos
+        server-addr: 114.116.44.130:8848
+        username: nacos
+    stream:
+      bindings:
+        inputCreateOrder:
+          content-type: application/json
+          destination: bibaboCreateOrderTopic
+          group: bibaboCreateOrderGroup
+        outputCreateOrder2Sms:
+          content-type: application/json
+          destination: bibaboCreateOrder2SmsTopic
+      rocketmq:
+        binder:
+          name-server: 39.107.156.177:9876
+        bindings:
+          outputCreateOrder2Sms:
+            producer:
+              async: true
+              group: bibaboCreateOrder2SmsGroup
+    sentinel:
+      ## 公司内网，sentinel控制台无法访问推送
+      transport:
+        port: 8719
+        dashboard: 114.116.44.130:9090
+      datasource:
+        order-flow:
+          nacos:
+            server-addr: 114.116.44.130:8848
+            data-id: ${spring.application.name}-flow-rules
+            username: nacos
+            password: nacos
+            groupId: SENTINEL_GROUP
+            ruleType: flow
+        order-degrade:
+          nacos:
+            server-addr: 114.116.44.130:8848
+            data-id: ${spring.application.name}-degrade-rules
+            username: nacos
+            password: nacos
+            groupId: SENTINEL_GROUP
+            ruleType: degrade
+
+dubbo:
+  cloud:
+    subscribed-services: bibabo-order-service
+  protocol:
+    id: dubbo
+    name: dubbo
+    port: -1
+  scan:
+    base-packages: com.bibabo.bibaboorderservice
+
+logging:
+  level:
+    com:
+      alibaba:
+        cloud:
+          stream:
+            binder:
+              rocketmq: DEBUG

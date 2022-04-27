@@ -1,5 +1,6 @@
 package com.bibabo.bibaboorderservice.services.impl;
 
+import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.bibabo.order.dto.OrderModel;
 import com.bibabo.order.dto.OrderRequestDTO;
 import com.bibabo.order.dto.OrderResponseDTO;
@@ -21,6 +22,7 @@ public class OrderServiceImpl implements OrderServiceI {
     public static final ConcurrentHashMap<Long, OrderModel> ORDER_CONTAINER = new ConcurrentHashMap<>();
 
     @Override
+    @SentinelResource(value = "flow-create-order", fallback = "createOrderFallBack")
     public OrderResponseDTO createOrder(OrderRequestDTO dto) {
         log.info("接单服务接收请求 {}", dto);
         OrderResponseDTO responseDTO = new OrderResponseDTO(true, dto.getOrderModel().getOrderId());
@@ -29,8 +31,33 @@ public class OrderServiceImpl implements OrderServiceI {
         return responseDTO;
     }
 
+    public OrderResponseDTO createOrderFallBack(OrderRequestDTO dto) {
+        log.error(String.format("createOrderFallBack限流，创建订单orderId:%d 失败", dto.getOrderModel().getOrderId()));
+        return new OrderResponseDTO(false, dto.getOrderModel().getOrderId());
+    }
+
     @Override
+    @SentinelResource(value = "flow-query-order", fallback = "queryOrderFailBack")
     public OrderModel queryOrderById(long orderId) {
+        return ORDER_CONTAINER.get(orderId) == null ? new OrderModel() : ORDER_CONTAINER.get(orderId);
+    }
+
+    public OrderModel queryOrderFailBack(long orderId) {
+        log.error(String.format("queryOrderById限流，获取订单orderId:%d 失败", orderId));
+        return new OrderModel();
+    }
+
+    /*@Override
+    @SentinelResource(value = "degrade-query-order", fallback = "queryOrderCircuitBreak")
+    public OrderModel queryOrderById(long orderId) {
+        if (ORDER_CONTAINER.get(orderId) == null) {
+            throw new RuntimeException("queryOrderById出现了异常");
+        }
         return ORDER_CONTAINER.get(orderId);
     }
+
+    public OrderModel queryOrderCircuitBreak(long orderId) {
+        log.error(String.format("queryOrderById熔断，获取订单orderId:%d 失败", orderId));
+        return new OrderModel();
+    }*/
 }
