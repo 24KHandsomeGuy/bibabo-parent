@@ -24,6 +24,8 @@ spring:
             producer:
               async: true
               group: bibaboCreateOrder2SmsGroup
+              sendMsgTimeout: 1000
+
     sentinel:
       ## 公司内网，sentinel控制台无法访问推送
       transport:

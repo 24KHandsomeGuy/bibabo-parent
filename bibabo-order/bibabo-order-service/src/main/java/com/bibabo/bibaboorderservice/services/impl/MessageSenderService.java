@@ -1,5 +1,6 @@
 package com.bibabo.bibaboorderservice.services.impl;
 
+import com.alibaba.cloud.stream.binder.rocketmq.constant.RocketMQConst;
 import com.bibabo.bibaboorderservice.channel.SmsSource;
 import com.bibabo.order.dto.OrderModel;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,7 @@ import org.springframework.util.MimeTypeUtils;
  * @date 2022/4/7
  * @time 16:41
  * @description
+ * RocketMQProducerMessageHandler#handleMessageInternal()
  */
 @Service
 @Slf4j
@@ -31,7 +33,10 @@ public class MessageSenderService {
      * @return
      */
     public <T> boolean sendCreateOrder2SmsMsg(OrderModel msg) {
-        MessageBuilder builder = MessageBuilder.withPayload(msg).setHeader(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON);
+        MessageBuilder builder = MessageBuilder.withPayload(msg)
+                .setHeader(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON)
+                // .setHeader(RocketMQConst.PROPERTY_DELAY_TIME_LEVEL, 3)
+                ;
         Message message = builder.build();
         return smsSource.outputCreateOrder2Sms().send(message);
     }

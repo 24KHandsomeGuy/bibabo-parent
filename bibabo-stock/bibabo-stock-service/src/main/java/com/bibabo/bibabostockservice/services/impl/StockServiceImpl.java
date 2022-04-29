@@ -14,7 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.annotation.PostConstruct;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -40,35 +42,46 @@ public class StockServiceImpl implements StockServiceI {
             RBucket<StockRedisDTO> rBucket = redissonClient.getBucket(prefix + skuId);
             rBucket.set(new StockRedisDTO(skuId, 1, 10));
             Instant instant = Instant.now().plusMillis(TimeUnit.HOURS.toMillis(1));
-            log.info(instant.toString());
             rBucket.expire(instant);
         }
     }
 
     @Override
     public OccupyStockResponseDTO occupyStock(List<StockReqeustDTO> reqeustDTOList) {
-        for (StockReqeustDTO dto : reqeustDTOList) {
+        Instant instant = Instant.now().plusMillis(TimeUnit.HOURS.toMillis(1));
+        Map<Long, Integer> shortSkuIdsMap = new HashMap<>();
+        reqeustDTOList.forEach(dto -> {
             RBucket<StockRedisDTO> rBucket = redissonClient.getBucket(prefix + dto.getSkuId());
             StockRedisDTO redisDTO = rBucket.get();
             int surplusStock = redisDTO.getStockNum() - dto.getSkuNum();
             if (surplusStock < 0) {
-                return new OccupyStockResponseDTO(-1, "sku" + dto.getSkuId() + "库存不足");
+                shortSkuIdsMap.put(dto.getSkuId(), surplusStock);
+                return;
             }
             redisDTO.setStockNum(surplusStock);
             rBucket.set(redisDTO);
+            rBucket.expire(instant);
+        });
+        if (shortSkuIdsMap.size() <= 0) {
+            return new OccupyStockResponseDTO(1, "占用成功");
         }
-        return new OccupyStockResponseDTO(1, "占用成功");
+        StringBuilder sb = new StringBuilder();
+        shortSkuIdsMap.forEach((skuId, shortNum) -> {
+            sb.append("sku:").append(skuId).append("，报缺数量:").append(shortNum).append("; ");
+        });
+
+        return new OccupyStockResponseDTO(-1, sb.toString());
     }
 
     @Override
     public List<StockResponseDTO> getStock(List<StockReqeustDTO> reqeustDTOList) {
         List<StockResponseDTO> responseDTOList = new ArrayList<>();
-        for (StockReqeustDTO dto : reqeustDTOList) {
+        reqeustDTOList.parallelStream().forEach(dto -> {
             RBucket<StockRedisDTO> redisDTORBucket = redissonClient.getBucket(prefix + dto.getSkuId());
             Integer stockNum = redisDTORBucket.get().getStockNum();
             StockResponseDTO responseDTO = new StockResponseDTO(dto.getSkuId(), dto.getWareId(), stockNum);
             responseDTOList.add(responseDTO);
-        }
+        });
         return responseDTOList;
     }
 }
