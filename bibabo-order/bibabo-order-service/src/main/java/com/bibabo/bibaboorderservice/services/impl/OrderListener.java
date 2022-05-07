@@ -25,7 +25,7 @@ import java.util.concurrent.ThreadPoolExecutor;
  */
 @Service
 @Slf4j
-public class CreateOrderListener {
+public class OrderListener {
 
     @Autowired
     private BBBThreadPoolExecutor bbbThreadPoolExecutor;
@@ -34,10 +34,10 @@ public class CreateOrderListener {
     private MessageSenderService messageSenderService;
 
 
-    @StreamListener("inputCreateOrder")
-    public void receiveInputCreateOrderMsg(@Payload long orderId) {
+    @StreamListener("inputOrderPaid")
+    public void receiveInputOrderPaidMsg(@Payload long orderId) {
 
-        log.info(String.format("receiveInputCreateOrderMsg receive message %s", orderId));
+        log.info(String.format("receiveInputOrderPaidMsg receive message %d", orderId));
 
         ThreadPoolExecutor executor = bbbThreadPoolExecutor.getExecutor();
 
@@ -105,4 +105,21 @@ public class CreateOrderListener {
         });
     }
 
+
+    @StreamListener("inputPaymentTimeOutCheck")
+    public void receiveInputPaymentTimeOutCheckMsg(@Payload long orderId) {
+        log.info(String.format("receiveInputPaymentTimeOutCheckMsg receive message %d", orderId));
+
+        OrderModel omDb = OrderServiceImpl.ORDER_CONTAINER.get(orderId);
+        if (omDb == null) {
+            log.error(String.format("receiveInputPaymentTimeOutCheckMsg orderId:%d non existent", orderId));
+            return;
+        }
+        if (omDb.getIsPayed() != null && omDb.getIsPayed() == 1) {
+            log.info(String.format("receiveInputPaymentTimeOutCheckMsg orderId:%d already paid", orderId));
+            return;
+        }
+        log.info(String.format("receiveInputPaymentTimeOutCheckMsg orderId:%d no payment, about to cancel. ", orderId));
+        OrderServiceImpl.ORDER_CONTAINER.remove(orderId);
+    }
 }

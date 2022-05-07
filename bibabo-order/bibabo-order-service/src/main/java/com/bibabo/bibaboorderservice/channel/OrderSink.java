@@ -11,6 +11,9 @@ import org.springframework.messaging.SubscribableChannel;
  */
 public interface OrderSink {
 
-    @Input("inputCreateOrder")
-    SubscribableChannel inputCreateOrder();
+    @Input("inputOrderPaid")
+    SubscribableChannel inputOrderPaid();
+
+    @Input("inputPaymentTimeOutCheck")
+    SubscribableChannel inputPaymentTimeOutCheck();
 }

@@ -14,4 +14,6 @@ public interface OrderServiceI {
     OrderResponseDTO createOrder(OrderRequestDTO dto);
 
     OrderModel queryOrderById(long orderId);
+
+    OrderResponseDTO payOrder(long orderId);
 }

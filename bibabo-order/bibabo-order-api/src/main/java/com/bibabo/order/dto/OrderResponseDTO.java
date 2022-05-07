@@ -2,6 +2,7 @@ package com.bibabo.order.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NonNull;
 
 /**
  * @Author: Damon Fu
@@ -15,4 +16,6 @@ public class OrderResponseDTO extends BaseDTO {
     private Boolean success;
 
     private Long orderId;
+
+    private String errorMessage;
 }

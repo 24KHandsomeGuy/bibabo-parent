@@ -26,3 +26,6 @@ dubbo+sentinel+nacos配置中心动态刷新sentinel规则配置
 
 ### 2022-04-27
 nacos配置中心集成完毕
+
+### 2022-05-07
+支付体系完成

@@ -3,8 +3,8 @@ package com.bibabo.bibabotrade.controller;
 import com.bibabo.bibabotrade.message.sender.MessageSenderService;
 import com.bibabo.bibabotrade.model.ao.OrderAO;
 import com.bibabo.bibabotrade.model.bo.TransactionalMessageBO;
-import com.bibabo.bibabotrade.model.dto.CreateOrderMessageDTO;
 import com.bibabo.bibabotrade.model.vo.CreateOrderVO;
+import com.bibabo.bibabotrade.model.vo.OrderPayVO;
 import com.bibabo.bibabotrade.services.CreateOrderServiceI;
 import com.bibabo.bibabotrade.utils.NumberGenerator;
 import com.bibabo.order.dto.OrderModel;
@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,20 +43,23 @@ public class OrderController {
     public CreateOrderVO createOrder(@RequestBody OrderAO orderAO) {
         log.info("交易系统接收前端下单请求参数：{} ", orderAO);
 
-        CreateOrderVO vo = new CreateOrderVO(false, null, "创建失败");
         // 组装创建订单业务DTO。获取订单号、填充时间
         Date now = new Date();
         long orderId = numberGenerator.generateOrderId();
         orderAO.setOrderId(orderId);
         orderAO.setCreateDate(now);
-        // 业务逻辑执行BO
-        TransactionalMessageBO<CreateOrderVO> bo = new TransactionalMessageBO();
-        bo.setMessageDTO(orderAO);
-
-        // 发送事务消息并回调执行本地事务处理
-        boolean rst = messageSender.sendCreateOrderTransactionalMsg(orderId, bo);
-        if (rst) {
-            vo = bo.getResult();
+        CreateOrderVO vo = new CreateOrderVO(false, orderId, "创建失败");
+        // 创建订单，多服务中、任一服务失败则抛出异常，全局分布式事务回滚（创建订单使用强一致事务）
+        try {
+            vo = createOrderService.createOrder(orderAO);
+        } catch (RuntimeException e) {
+            log.error(String.format("订单号%d，创建订单失败%s", orderId, e.getMessage()), e);
+            vo.setErrorMsg("创建失败：" + e.getMessage());
+        }
+        // 创建成功发送一条支付超时检查消息，支付超时需要自动取消订单
+        // 在这个地方发送消息，可能会存在消息的丢失，所以作为补偿，还需要有一个job定时抓取支付超时订单取消掉
+        if (vo.getSuccess()) {
+            messageSender.sendPaymentTimeOutCheckMsg(orderId);
         }
 
         log.info("交易系统接收前端下单请求参数：{} 响应结果：{}", orderAO, vo);
@@ -70,5 +74,27 @@ public class OrderController {
             orderModelList.add(orderModel);
         });
         return orderModelList;
+    }
+
+    @PutMapping("/order")
+    public OrderPayVO payOrder(@RequestBody OrderAO orderAO) {
+        log.info("交易系统接收前端支付请求参数：{} ", orderAO);
+
+        OrderPayVO vo = new OrderPayVO(false, null, null);
+        if (orderAO.getOrderId() == null) {
+            vo.setErrorMsg(String.format("参数校验，orderId不可以为空%s", orderAO));
+            return vo;
+        }
+
+        // 业务逻辑执行BO
+        TransactionalMessageBO<OrderPayVO> bo = new TransactionalMessageBO<>();
+        bo.setMessageDTO(orderAO);
+        boolean sendRst = messageSender.sendPayedOrderTransactionalMsg(orderAO.getOrderId(), bo);
+        if (sendRst && bo.getResult() != null) {
+            vo = bo.getResult();
+        }
+
+        log.info("交易系统接收前端下单请求参数：{} 响应结果：{}", orderAO, vo);
+        return vo;
     }
 }

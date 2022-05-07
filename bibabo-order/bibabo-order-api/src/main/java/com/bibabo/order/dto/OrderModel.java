@@ -35,4 +35,9 @@ public class OrderModel extends BaseDTO {
      * 顾客地址
      */
     private String address;
+
+    /**
+     * 是否已支付
+     */
+    private Short isPayed;
 }

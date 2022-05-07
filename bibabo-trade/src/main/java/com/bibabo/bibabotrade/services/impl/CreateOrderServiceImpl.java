@@ -3,6 +3,7 @@ package com.bibabo.bibabotrade.services.impl;
 import com.bibabo.bibabotrade.model.ao.OrderAO;
 import com.bibabo.bibabotrade.model.ao.OrderDetailAO;
 import com.bibabo.bibabotrade.model.vo.CreateOrderVO;
+import com.bibabo.bibabotrade.model.vo.OrderPayVO;
 import com.bibabo.bibabotrade.services.CreateOrderServiceI;
 import com.bibabo.order.dto.OrderDetailModel;
 import com.bibabo.order.dto.OrderModel;
@@ -57,7 +58,7 @@ public class CreateOrderServiceImpl implements CreateOrderServiceI {
         // 占用库存
         OccupyStockResponseDTO occupyStockResponseDTO = stockService.occupyStock(stockReqeustDTOList);
         if (occupyStockResponseDTO.getRtnStatus() == -1) {
-            return new CreateOrderVO(false, orderAO.getOrderId(), "占用库存失败" + occupyStockResponseDTO.getRtnMsg());
+            throw new RuntimeException("占用库存失败" + occupyStockResponseDTO.getRtnMsg());
         }
 
         OrderRequestDTO requestDTO = new OrderRequestDTO();
@@ -65,10 +66,11 @@ public class CreateOrderServiceImpl implements CreateOrderServiceI {
         orderAO.setOrderDetailAOList(null);
         BeanUtils.copyProperties(orderAO, orderModel);
         requestDTO.setOrderModel(orderModel);
+        orderModel.setOrderDetailModelList(orderDetailModelList);
 
         OrderResponseDTO responseDTO = orderService.createOrder(requestDTO);
-        if (null == responseDTO) {
-            return new CreateOrderVO(false, orderAO.getOrderId(), null);
+        if (null == responseDTO || !responseDTO.getSuccess()) {
+            throw new RuntimeException("订单创建失败" + responseDTO.getErrorMessage());
         }
         return new CreateOrderVO(responseDTO.getSuccess(), responseDTO.getOrderId(), null);
     }

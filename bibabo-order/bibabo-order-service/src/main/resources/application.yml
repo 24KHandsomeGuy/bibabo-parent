@@ -9,13 +9,17 @@ spring:
 
     stream:
       bindings:
-        inputCreateOrder:
+        inputOrderPaid:
           content-type: application/json
-          destination: bibaboCreateOrderTopic
-          group: bibaboCreateOrderGroup
+          destination: bibaboOrderPaidTopic
+          group: bibaboOrderPaidGroup
         outputCreateOrder2Sms:
           content-type: application/json
           destination: bibaboCreateOrder2SmsTopic
+        inputPaymentTimeOutCheck:
+          content-type: application/json
+          destination: bibaboPaymentTimeOutCheckTopic
+          group: bibaboPaymentTimeOutCheckGroup
       rocketmq:
         binder:
           name-server: 39.107.156.177:9876

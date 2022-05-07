@@ -11,6 +11,9 @@ import org.springframework.messaging.MessageChannel;
  */
 public interface OrderSource {
 
-    @Output("outputCreateOrder")
-    MessageChannel outputCreateOrder();
+    @Output("outputOrderPaid")
+    MessageChannel outputOrderPaid();
+
+    @Output("outputPaymentTimeOutCheck")
+    MessageChannel outputPaymentTimeOutCheck();
 }

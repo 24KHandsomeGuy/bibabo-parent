@@ -16,27 +16,50 @@ import org.springframework.util.MimeTypeUtils;
  * @date 2022/4/7
  * @time 16:41
  * @description
+ *
+ * @see org.apache.rocketmq.client.impl.producer.DefaultMQProducerImpl#sendMessageInTransaction
+ *          // ignore DelayTimeLevel parameter
+ *         if (msg.getDelayTimeLevel() != 0) {
+ *             MessageAccessor.clearProperty(msg, MessageConst.PROPERTY_DELAY_TIME_LEVEL);
+ *         }
+ * 由此可见事务消息发送会清除掉延时发送参数
  */
 @Service
 @Slf4j
 public class MessageSenderService {
 
     @Autowired
-    private OrderSource createOrderSource;
+    private OrderSource orderSource;
 
     /**
-     * 发送创建订单事务消息
+     * 发送订单支付事务消息
      *
      * @param msg
      * @param bo
      * @param <T>
      * @return
      */
-    public <T> boolean sendCreateOrderTransactionalMsg(Long msg, TransactionalMessageBO<T> bo) {
+    public <T> boolean sendPayedOrderTransactionalMsg(Long msg, TransactionalMessageBO<T> bo) {
         MessageBuilder builder = MessageBuilder.withPayload(msg).setHeader(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON);
         // 事务obj key
         builder.setHeader(RocketMQConst.USER_TRANSACTIONAL_ARGS, bo);
         Message message = builder.build();
-        return createOrderSource.outputCreateOrder().send(message);
+        return orderSource.outputOrderPaid().send(message);
+    }
+
+    /**
+     * 发送支付超时取消检查消息
+     *
+     * @param msg
+     * @param <T>
+     * @return
+     */
+    public <T> boolean sendPaymentTimeOutCheckMsg(Long msg) {
+        MessageBuilder builder = MessageBuilder.withPayload(msg).setHeader(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON);
+        // delay key
+        builder.setHeader(RocketMQConst.PROPERTY_DELAY_TIME_LEVEL, 2);
+        // builder.setHeader(RocketMQConst.PROPERTY_DELAY_TIME_LEVEL, 3);
+        Message message = builder.build();
+        return orderSource.outputPaymentTimeOutCheck().send(message);
     }
 }
