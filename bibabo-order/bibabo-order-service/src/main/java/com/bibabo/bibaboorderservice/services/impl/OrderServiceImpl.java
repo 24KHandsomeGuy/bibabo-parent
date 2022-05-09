@@ -1,15 +1,23 @@
 package com.bibabo.bibaboorderservice.services.impl;
 
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
+import com.bibabo.bibaboorderservice.domain.OrderDetail;
+import com.bibabo.bibaboorderservice.domain.OrderMain;
+import com.bibabo.bibaboorderservice.model.enums.OrderStatusEnum;
+import com.bibabo.bibaboorderservice.services.OrderMainService;
+import com.bibabo.order.dto.OrderDetailModel;
 import com.bibabo.order.dto.OrderModel;
 import com.bibabo.order.dto.OrderRequestDTO;
 import com.bibabo.order.dto.OrderResponseDTO;
 import com.bibabo.order.services.OrderServiceI;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.PostConstruct;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -23,22 +31,78 @@ public class OrderServiceImpl implements OrderServiceI {
 
     public static final ConcurrentHashMap<Long, OrderModel> ORDER_CONTAINER = new ConcurrentHashMap<>();
 
-    @Value("${nacos.name}")
+    /*@Value("${nacos.name}")
     private String name;
 
     @PostConstruct
     public void init() {
         log.info("");
-    }
+    }*/
+
+    @Autowired
+    private OrderMainService orderMainService;
 
     @Override
     @SentinelResource(value = "flow-create-order", fallback = "createOrderFallBack")
     public OrderResponseDTO createOrder(OrderRequestDTO dto) {
         log.info("接单服务接收请求 {}", dto);
         OrderResponseDTO responseDTO = new OrderResponseDTO(true, dto.getOrderModel().getOrderId(), null);
-        ORDER_CONTAINER.putIfAbsent(dto.getOrderModel().getOrderId(), dto.getOrderModel());
-        log.info("创建订单成功");
+        OrderModel orderModel = dto.getOrderModel();
+        OrderMain orderMain = buildOrderMain(orderModel);
+        List<OrderDetail> orderDetailList = buildOrderDetailList(orderModel);
+        OrderMain rstOm = orderMainService.saveOrderAndDetail(orderMain, orderDetailList);
+        if (rstOm != null) {
+            log.info("创建订单成功orderId:{}", orderModel.getOrderId());
+            return responseDTO;
+        }
+        log.info("创建订单失败orderId:{}", orderModel.getOrderId());
         return responseDTO;
+    }
+
+    private OrderMain buildOrderMain(OrderModel orderModel) {
+        Date now = new Date();
+        return OrderMain.builder()
+                .orderId(orderModel.getOrderId())
+                .orderStatus(OrderStatusEnum.WAIT_FOR_PAY.getStatus())
+                .isFinish(0)
+                .wareId(1)
+                .custId(1L)
+                .custName("Damon")
+                .custMobile("18511111111")
+                .payMoney(BigDecimal.ZERO)
+                .totalPrice(BigDecimal.ZERO)
+                .couponPrice(BigDecimal.ZERO)
+                .deliveryPrice(BigDecimal.ZERO)
+                .isPayed(0)
+                .province("北京")
+                .city("北京市")
+                .county("朝阳区")
+                .custAddress("三里屯")
+                .orderDate(now)
+                .bookDate(now)
+                .createDate(now)
+                .build();
+    }
+
+    private List<OrderDetail> buildOrderDetailList(OrderModel orderModel) {
+        List<OrderDetailModel> orderDetailModelList = orderModel.getOrderDetailModelList();
+        List<OrderDetail> orderDetailList = new ArrayList<>(orderDetailModelList.size());
+        Date now = new Date();
+        orderDetailModelList.forEach(odm ->
+                orderDetailList.add(OrderDetail.builder()
+                        .orderId(orderModel.getOrderId())
+                        .lineNo(1)
+                        .skuId(odm.getSkuId())
+                        .skuName(odm.getSkuName())
+                        .wareId(1)
+                        .skuNum(odm.getSkuNum())
+                        .skuPrice(BigDecimal.ZERO)
+                        .salePrice(BigDecimal.ZERO)
+                        .isGift(1)
+                        .createDate(now)
+                        .bookDate(now)
+                        .build()));
+        return orderDetailList;
     }
 
     public OrderResponseDTO createOrderFallBack(OrderRequestDTO dto) {

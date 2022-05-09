@@ -1,3 +1,5 @@
+
+
 spring:
   main:
     allow-bean-definition-overriding: true
@@ -53,6 +55,33 @@ spring:
             groupId: SENTINEL_GROUP
             ruleType: degrade
 
+  datasource:
+    connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=500
+    driver-class-name: com.mysql.jdbc.Driver
+    filters: stat
+    initialSize: 5
+    maxActive: 20
+    maxPoolPreparedStatementPerConnectionSize: 20
+    maxWait: 60000
+    minEvictableIdleTimeMillis: 300000
+    minIdle: 5
+    username: root
+    password: 123456
+    poolPreparedStatements: true
+    testOnBorrow: false
+    testOnReturn: false
+    testWhileIdle: true
+    timeBetweenEvictionRunsMillis: 60000
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://114.116.44.130:3306/bibabo_order?characterEncoding=utf-8&serverTimezone=GMT%2B8
+    useGlobalDataSourceStat: true
+    validationQuery: SELECT 1 FROM DUAL
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL55Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
 dubbo:
   cloud:
     subscribed-services: bibabo-order-service
@@ -73,3 +102,5 @@ logging:
               rocketmq: DEBUG
           nacos:
             client: debug
+server:
+  port: 10086
