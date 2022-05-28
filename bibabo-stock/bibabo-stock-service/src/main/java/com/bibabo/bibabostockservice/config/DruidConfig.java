@@ -1,4 +1,4 @@
-package com.bibabo.bibaboorderservice.config;
+package com.bibabo.bibabostockservice.config;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.support.http.StatViewServlet;

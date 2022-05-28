@@ -8,5 +8,6 @@ spring:
         shared-configs:
           - data-id: ${spring.application.name}.yml
             refresh: true
+        group: BIBABO_GROUP
       username: nacos
       password: nacos

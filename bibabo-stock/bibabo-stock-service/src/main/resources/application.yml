@@ -1,6 +1,6 @@
 spring:
   application:
-      name: bibabo-stock-service
+    name: bibabo-stock-service
   main:
     allow-bean-definition-overriding: true
   cloud:
@@ -23,7 +23,7 @@ spring:
             data-id: ${spring.application.name}-flow-rules
             username: nacos
             password: nacos
-            groupId: SENTINEL_GROUP
+            groupId: BIBABO_SENTINEL_GROUP
             ruleType: flow
         stock-degrade:
           nacos:
@@ -31,7 +31,7 @@ spring:
             data-id: ${spring.application.name}-degrade-rules
             username: nacos
             password: nacos
-            groupId: SENTINEL_GROUP
+            groupId: BIBABO_SENTINEL_GROUP
             ruleType: degrade
 
   redis:
@@ -41,6 +41,33 @@ spring:
           address: redis://39.107.156.177:6379
           database: 10
           password: 123456
+
+  datasource:
+    connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=500
+    driver-class-name: com.mysql.jdbc.Driver
+    filters: stat
+    initialSize: 5
+    maxActive: 20
+    maxPoolPreparedStatementPerConnectionSize: 20
+    maxWait: 60000
+    minEvictableIdleTimeMillis: 300000
+    minIdle: 5
+    username: root
+    password: 123456
+    poolPreparedStatements: true
+    testOnBorrow: false
+    testOnReturn: false
+    testWhileIdle: true
+    timeBetweenEvictionRunsMillis: 60000
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://114.116.44.130:3306/bibabo_stock?characterEncoding=utf-8&serverTimezone=GMT%2B8
+    useGlobalDataSourceStat: true
+    validationQuery: SELECT 1 FROM DUAL
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL55Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
 
 dubbo:
   cloud:
@@ -52,3 +79,5 @@ dubbo:
   scan:
     base-packages: com.bibabo.bibabostockservice
 
+server:
+  port: 10087

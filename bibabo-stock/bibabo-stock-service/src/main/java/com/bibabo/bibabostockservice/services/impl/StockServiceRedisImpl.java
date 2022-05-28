@@ -1,3 +1,4 @@
+/*
 package com.bibabo.bibabostockservice.services.impl;
 
 import com.bibabo.stock.dto.OccupyStockResponseDTO;
@@ -19,15 +20,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+*/
 /**
  * @author fukuixiang
  * @date 2022/4/27
  * @time 15:35
  * @description
- */
+ *//*
+
 @Slf4j
 @DubboService
-public class StockServiceImpl implements StockServiceI {
+public class StockServiceRedisImpl implements StockServiceI {
 
     private static final String prefix = "stock_";
 
@@ -85,3 +88,4 @@ public class StockServiceImpl implements StockServiceI {
         return responseDTOList;
     }
 }
+*/

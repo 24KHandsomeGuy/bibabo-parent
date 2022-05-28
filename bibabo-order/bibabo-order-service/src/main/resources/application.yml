@@ -44,7 +44,7 @@ spring:
             data-id: ${spring.application.name}-flow-rules
             username: nacos
             password: nacos
-            groupId: SENTINEL_GROUP
+            groupId: BIBABO_SENTINEL_GROUP
             ruleType: flow
         order-degrade:
           nacos:
@@ -52,7 +52,7 @@ spring:
             data-id: ${spring.application.name}-degrade-rules
             username: nacos
             password: nacos
-            groupId: SENTINEL_GROUP
+            groupId: BIBABO_SENTINEL_GROUP
             ruleType: degrade
 
   datasource:
