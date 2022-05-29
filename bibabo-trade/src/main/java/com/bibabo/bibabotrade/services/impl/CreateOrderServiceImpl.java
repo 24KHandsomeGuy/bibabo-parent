@@ -3,7 +3,6 @@ package com.bibabo.bibabotrade.services.impl;
 import com.bibabo.bibabotrade.model.ao.OrderAO;
 import com.bibabo.bibabotrade.model.ao.OrderDetailAO;
 import com.bibabo.bibabotrade.model.vo.CreateOrderVO;
-import com.bibabo.bibabotrade.model.vo.OrderPayVO;
 import com.bibabo.bibabotrade.services.CreateOrderServiceI;
 import com.bibabo.order.dto.OrderDetailModel;
 import com.bibabo.order.dto.OrderModel;
@@ -11,8 +10,8 @@ import com.bibabo.order.dto.OrderRequestDTO;
 import com.bibabo.order.dto.OrderResponseDTO;
 import com.bibabo.stock.dto.OccupyStockResponseDTO;
 import com.bibabo.stock.dto.StockReqeustDTO;
-import com.bibabo.stock.dto.StockResponseDTO;
 import com.bibabo.stock.services.StockServiceI;
+import io.seata.spring.annotation.GlobalTransactional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.BeanUtils;
@@ -38,6 +37,7 @@ public class CreateOrderServiceImpl implements CreateOrderServiceI {
     private StockServiceI stockService;
 
     @Override
+    @GlobalTransactional(timeoutMills = 10000, name = "create-order")
     public CreateOrderVO createOrder(OrderAO orderAO) {
         List<OrderDetailAO> orderDetailAOList = orderAO.getOrderDetailAOList();
         List<OrderDetailModel> orderDetailModelList = new ArrayList<>(orderDetailAOList.size());
@@ -55,23 +55,24 @@ public class CreateOrderServiceImpl implements CreateOrderServiceI {
             stockReqeustDTOList.add(stockReqeustDTO);
         }
 
-        // 占用库存
-        OccupyStockResponseDTO occupyStockResponseDTO = stockService.occupyStock(stockReqeustDTOList);
-        if (occupyStockResponseDTO.getRtnStatus() == -1) {
-            throw new RuntimeException("占用库存失败" + occupyStockResponseDTO.getRtnMsg());
-        }
-
+        // 先创建订单，检查分布式事务是否生效
         OrderRequestDTO requestDTO = new OrderRequestDTO();
         OrderModel orderModel = new OrderModel();
         orderAO.setOrderDetailAOList(null);
         BeanUtils.copyProperties(orderAO, orderModel);
         requestDTO.setOrderModel(orderModel);
         orderModel.setOrderDetailModelList(orderDetailModelList);
-
         OrderResponseDTO responseDTO = orderService.createOrder(requestDTO);
         if (null == responseDTO || !responseDTO.getSuccess()) {
             throw new RuntimeException("订单创建失败" + responseDTO.getErrorMessage());
         }
+
+        // 占用库存
+        OccupyStockResponseDTO occupyStockResponseDTO = stockService.occupyStock(stockReqeustDTOList);
+        if (occupyStockResponseDTO.getRtnStatus() == -1) {
+            throw new RuntimeException("占用库存失败" + occupyStockResponseDTO.getRtnMsg());
+        }
+
         return new CreateOrderVO(responseDTO.getSuccess(), responseDTO.getOrderId(), null);
     }
 
