@@ -14,4 +14,10 @@ import java.util.List;
 public interface OrderMainService {
 
     OrderMain saveOrderAndDetail(OrderMain orderMain, List<OrderDetail> orderDetailList);
+
+    OrderMain findByOrderId(long orderId);
+
+    int updateOrderStatusCancel(long orderId);
+
+    int updateOrderIsPayed(long orderId);
 }

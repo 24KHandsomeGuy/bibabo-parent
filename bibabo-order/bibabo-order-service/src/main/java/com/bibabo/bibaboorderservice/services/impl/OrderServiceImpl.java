@@ -12,13 +12,14 @@ import com.bibabo.order.dto.OrderResponseDTO;
 import com.bibabo.order.services.OrderServiceI;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Optional;
 
 /**
  * @Author: Damon Fu
@@ -29,7 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class OrderServiceImpl implements OrderServiceI {
 
-    public static final ConcurrentHashMap<Long, OrderModel> ORDER_CONTAINER = new ConcurrentHashMap<>();
+    // public static final ConcurrentHashMap<Long, OrderModel> ORDER_CONTAINER = new ConcurrentHashMap<>();
 
     /*@Value("${nacos.name}")
     private String name;
@@ -48,7 +49,7 @@ public class OrderServiceImpl implements OrderServiceI {
         log.info("接单服务接收请求 {}", dto);
         OrderResponseDTO responseDTO = new OrderResponseDTO(true, dto.getOrderModel().getOrderId(), null);
         OrderModel orderModel = dto.getOrderModel();
-        OrderMain orderMain = buildOrderMain(orderModel);
+        OrderMain orderMain = buildOrderMain(orderModel, OrderStatusEnum.NEW.getStatus());
         List<OrderDetail> orderDetailList = buildOrderDetailList(orderModel);
         OrderMain rstOm = orderMainService.saveOrderAndDetail(orderMain, orderDetailList);
         if (rstOm != null) {
@@ -59,11 +60,11 @@ public class OrderServiceImpl implements OrderServiceI {
         return responseDTO;
     }
 
-    private OrderMain buildOrderMain(OrderModel orderModel) {
+    private OrderMain buildOrderMain(OrderModel orderModel, int status) {
         Date now = new Date();
         return OrderMain.builder()
                 .orderId(orderModel.getOrderId())
-                .orderStatus(OrderStatusEnum.WAIT_FOR_PAY.getStatus())
+                .orderStatus(status)
                 .isFinish(0)
                 .wareId(1)
                 .custId(1L)
@@ -113,7 +114,11 @@ public class OrderServiceImpl implements OrderServiceI {
     @Override
     @SentinelResource(value = "flow-query-order", fallback = "queryOrderFailBack")
     public OrderModel queryOrderById(long orderId) {
-        return ORDER_CONTAINER.get(orderId) == null ? new OrderModel() : ORDER_CONTAINER.get(orderId);
+        OrderMain om = orderMainService.findByOrderId(orderId);
+        OrderModel orderModel = new OrderModel();
+        Optional<OrderMain> optional = Optional.ofNullable(om);
+        optional.ifPresent(orderMain -> BeanUtils.copyProperties(orderMain, orderModel));
+        return orderModel;
     }
 
     public OrderModel queryOrderFailBack(long orderId) {
@@ -137,11 +142,11 @@ public class OrderServiceImpl implements OrderServiceI {
 
     @Override
     public OrderResponseDTO payOrder(long orderId) {
-        if (ORDER_CONTAINER.get(orderId) == null) {
+        OrderMain om = orderMainService.findByOrderId(orderId);
+        if (om == null) {
             return new OrderResponseDTO(false, orderId, "订单不存在");
         }
-        OrderModel orderModel = ORDER_CONTAINER.get(orderId);
-        orderModel.setIsPayed((short) 1);
-        return new OrderResponseDTO(true, orderId, "支付成功");
+        int rst = orderMainService.updateOrderIsPayed(orderId);
+        return new OrderResponseDTO(rst > 0, orderId, rst > 0 ? "支付成功" : "支付失败");
     }
 }

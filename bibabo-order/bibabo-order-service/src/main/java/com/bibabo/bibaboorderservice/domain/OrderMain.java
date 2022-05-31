@@ -102,7 +102,7 @@ public class OrderMain extends BaseEntity {
     @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm:ss")
     private Date createDate;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "order_id", referencedColumnName = "order_id", insertable = false, updatable = false)
     private List<OrderDetail> orderDetailList;
 }

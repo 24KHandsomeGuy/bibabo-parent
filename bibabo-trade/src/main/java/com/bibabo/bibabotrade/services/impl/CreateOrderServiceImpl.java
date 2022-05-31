@@ -37,7 +37,7 @@ public class CreateOrderServiceImpl implements CreateOrderServiceI {
     private StockServiceI stockService;
 
     @Override
-    @GlobalTransactional(timeoutMills = 10000, name = "create-order")
+    @GlobalTransactional(timeoutMills = 2000, name = "create-order")
     public CreateOrderVO createOrder(OrderAO orderAO) {
         List<OrderDetailAO> orderDetailAOList = orderAO.getOrderDetailAOList();
         List<OrderDetailModel> orderDetailModelList = new ArrayList<>(orderDetailAOList.size());

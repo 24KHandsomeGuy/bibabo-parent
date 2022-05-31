@@ -57,8 +57,8 @@ public class MessageSenderService {
     public <T> boolean sendPaymentTimeOutCheckMsg(Long msg) {
         MessageBuilder builder = MessageBuilder.withPayload(msg).setHeader(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON);
         // delay key
-        builder.setHeader(RocketMQConst.PROPERTY_DELAY_TIME_LEVEL, 2);
-        // builder.setHeader(RocketMQConst.PROPERTY_DELAY_TIME_LEVEL, 3);
+        // builder.setHeader(RocketMQConst.PROPERTY_DELAY_TIME_LEVEL, 2);
+        builder.setHeader(RocketMQConst.PROPERTY_DELAY_TIME_LEVEL, 4);
         Message message = builder.build();
         return orderSource.outputPaymentTimeOutCheck().send(message);
     }

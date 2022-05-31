@@ -1,7 +1,8 @@
 package com.bibabo.bibaboorderservice.services.impl;
 
-import com.bibabo.bibaboorderservice.model.enums.SkuTypeEnum;
-import com.bibabo.order.dto.OrderDetailModel;
+import com.bibabo.bibaboorderservice.domain.OrderDetail;
+import com.bibabo.bibaboorderservice.domain.OrderMain;
+import com.bibabo.bibaboorderservice.services.OrderMainService;
 import com.bibabo.order.dto.OrderModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -33,6 +34,9 @@ public class OrderListener {
     @Autowired
     private MessageSenderService messageSenderService;
 
+    @Autowired
+    private OrderMainService orderMainService;
+
 
     @StreamListener("inputOrderPaid")
     public void receiveInputOrderPaidMsg(@Payload long orderId) {
@@ -41,9 +45,9 @@ public class OrderListener {
 
         ThreadPoolExecutor executor = bbbThreadPoolExecutor.getExecutor();
 
-        OrderModel omDb = OrderServiceImpl.ORDER_CONTAINER.get(orderId);
+        OrderMain omDb = orderMainService.findByOrderId(orderId);
         Optional.ofNullable(omDb).ifPresent(om -> {
-            List<OrderDetailModel> orderDetailModelList = om.getOrderDetailModelList();
+            List<OrderDetail> orderDetailList = om.getOrderDetailList();
 
             OrderModel omMsg = new OrderModel();
             omMsg.setOrderDetailModelList(null);
@@ -59,19 +63,19 @@ public class OrderListener {
             // 1.1 调用主数据填充虚拟组套子商品
             CompletableFuture<List<OrderModel>> splitOrderCompletableFuture = CompletableFuture.runAsync(() -> {
 
-                orderDetailModelList.forEach(od -> {
-                    if (od.getSkuType() == SkuTypeEnum.VIRTUAL_SUIT.getType()) {
+                orderDetailList.forEach(od -> {
+                    /*if (od.getSkuType() == SkuTypeEnum.VIRTUAL_SUIT.getType()) {
 
-                    }
+                    }*/
                 });
             }, executor).thenRun(() -> {// 1.2 调用主数据获取商品原价和销项税
                 List<Long> skuIdList = new ArrayList<>();
-                orderDetailModelList.forEach(od -> {
+                orderDetailList.forEach(od -> {
                             skuIdList.add(od.getSkuId());
                         }
                 );
 
-                orderDetailModelList.forEach(od -> {
+                orderDetailList.forEach(od -> {
                     // 调用系统获取
                     od.setSkuPrice(BigDecimal.ONE);
                 });
@@ -110,16 +114,17 @@ public class OrderListener {
     public void receiveInputPaymentTimeOutCheckMsg(@Payload long orderId) {
         log.info(String.format("receiveInputPaymentTimeOutCheckMsg receive message %d", orderId));
 
-        OrderModel omDb = OrderServiceImpl.ORDER_CONTAINER.get(orderId);
-        if (omDb == null) {
+        OrderMain om = orderMainService.findByOrderId(orderId);
+        if (om == null) {
             log.error(String.format("receiveInputPaymentTimeOutCheckMsg orderId:%d non existent", orderId));
             return;
         }
-        if (omDb.getIsPayed() != null && omDb.getIsPayed() == 1) {
+        if (om.getIsPayed() != null && om.getIsPayed() == 1) {
             log.info(String.format("receiveInputPaymentTimeOutCheckMsg orderId:%d already paid", orderId));
             return;
         }
         log.info(String.format("receiveInputPaymentTimeOutCheckMsg orderId:%d no payment, about to cancel. ", orderId));
-        OrderServiceImpl.ORDER_CONTAINER.remove(orderId);
+        int rst = orderMainService.updateOrderStatusCancel(orderId);
+        log.info(String.format("receiveInputPaymentTimeOutCheckMsg orderId:%d no payment, about to cancel. cancel result:%d ", orderId, rst));
     }
 }
