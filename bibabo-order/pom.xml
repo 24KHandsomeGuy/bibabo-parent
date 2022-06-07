@@ -35,6 +35,11 @@
             <artifactId>kryo-serializers</artifactId>
             <version>0.42</version>
         </dependency>
+        <dependency>
+            <artifactId>bibabo-common-util</artifactId>
+            <groupId>com.bibabo</groupId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
 </project>

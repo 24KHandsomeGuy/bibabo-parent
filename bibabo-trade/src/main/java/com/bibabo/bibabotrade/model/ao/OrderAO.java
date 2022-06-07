@@ -33,6 +33,8 @@ public class OrderAO extends MessageDTO {
      */
     private String custTelephone;
 
+    private String address;
+
     /**
      * 期望收货日期
      *//*

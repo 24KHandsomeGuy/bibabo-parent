@@ -55,4 +55,11 @@ public class OrderMainServiceImpl implements OrderMainService {
     public int updateOrderIsPayed(long orderId) {
         return orderMainRepository.updateOrderIsPayed(orderId, OrderStatusEnum.AMOUNT_PAID.getStatus(), OrderStatusEnum.AMOUNT_PAID.getStatus(), 1);
     }
+
+    @Override
+    @Transactional
+    public int updateOrderAddress(long orderId, String custAddress) {
+        return orderMainRepository.updateOrderAddress(orderId, custAddress);
+    }
+
 }

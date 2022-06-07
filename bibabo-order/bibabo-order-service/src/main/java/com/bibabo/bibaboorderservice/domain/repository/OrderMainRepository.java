@@ -22,4 +22,8 @@ public interface OrderMainRepository extends JpaRepository<OrderMain, Long> {
     @Modifying
     @Query("update OrderMain set orderStatus = ?2, isPayed = ?4 where orderId = ?1 and orderStatus < ?3")
     int updateOrderIsPayed(long orderId, int status, int status1, int i);
+
+    @Modifying
+    @Query("update OrderMain set custAddress = ?2 where orderId = ?1")
+    int updateOrderAddress(long orderId, String custAddress);
 }

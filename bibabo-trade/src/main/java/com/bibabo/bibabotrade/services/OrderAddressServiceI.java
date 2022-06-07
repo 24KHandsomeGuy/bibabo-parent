@@ -1,23 +1,15 @@
-package com.bibabo.order.services;
+package com.bibabo.bibabotrade.services;
 
 import com.bibabo.order.dto.OrderAddressInfoDTO;
-import com.bibabo.order.dto.OrderModel;
-import com.bibabo.order.dto.OrderRequestDTO;
-import com.bibabo.order.dto.OrderResponseDTO;
 import com.bibabo.utils.model.RpcResponseDTO;
 
 /**
- * @Author: Damon Fu
- * @Date: 2022/3/20 19:20
- * @Description:
+ * @author fukuixiang
+ * @date 2022/6/7
+ * @time 17:17
+ * @description
  */
-public interface OrderServiceI {
-
-    OrderResponseDTO createOrder(OrderRequestDTO dto);
-
-    OrderModel queryOrderById(long orderId);
-
-    OrderResponseDTO payOrder(long orderId);
+public interface OrderAddressServiceI {
 
     /**
      * 查询订单地址，用于Redis缓存试验

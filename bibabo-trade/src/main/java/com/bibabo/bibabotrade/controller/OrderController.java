@@ -6,8 +6,11 @@ import com.bibabo.bibabotrade.model.bo.TransactionalMessageBO;
 import com.bibabo.bibabotrade.model.vo.CreateOrderVO;
 import com.bibabo.bibabotrade.model.vo.OrderPayVO;
 import com.bibabo.bibabotrade.services.CreateOrderServiceI;
+import com.bibabo.bibabotrade.services.OrderAddressServiceI;
 import com.bibabo.bibabotrade.utils.NumberGenerator;
+import com.bibabo.order.dto.OrderAddressInfoDTO;
 import com.bibabo.order.dto.OrderModel;
+import com.bibabo.utils.model.RpcResponseDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,6 +42,10 @@ public class OrderController {
     @Autowired
     private MessageSenderService messageSender;
 
+    @Autowired
+    private OrderAddressServiceI orderAddressService;
+
+
     @PostMapping("/order")
     public CreateOrderVO createOrder(@RequestBody OrderAO orderAO) {
         log.info("交易系统接收前端下单请求参数：{} ", orderAO);
@@ -66,6 +73,7 @@ public class OrderController {
         return vo;
     }
 
+
     @GetMapping("/order")
     public List<OrderModel> listOrderByOrderIds(@RequestParam List<Long> orderIds) {
         List<OrderModel> orderModelList = new ArrayList<>(orderIds.size());
@@ -75,6 +83,7 @@ public class OrderController {
         });
         return orderModelList;
     }
+
 
     @PutMapping("/order")
     public OrderPayVO payOrder(@RequestBody OrderAO orderAO) {
@@ -97,4 +106,32 @@ public class OrderController {
         log.info("交易系统接收前端下单请求参数：{} 响应结果：{}", orderAO, vo);
         return vo;
     }
+
+
+    @GetMapping("/order/address")
+    public RpcResponseDTO getOrderAddress(@RequestParam long orderId) {
+        log.info("交易系统接收前端查询订单地址请求参数：{} ", orderId);
+        RpcResponseDTO responseDTO = orderAddressService.queryOrderAddress(orderId);
+        log.info("交易系统接收前端查询订单地址请求参数：{} 响应结果：{}", orderId, responseDTO);
+        return responseDTO;
+    }
+
+
+    @PutMapping("/order/address")
+    public RpcResponseDTO updateOrderAddress(@RequestBody OrderAO orderAO) {
+        log.info("交易系统接收前端修改订单地址请求参数：{} ", orderAO);
+
+        // 懒得转VO了
+        if (orderAO.getOrderId() == null) {
+            return RpcResponseDTO.builder().fail(String.format("参数校验，orderId不可以为空%s", orderAO)).build();
+        }
+
+        OrderAddressInfoDTO dto = new OrderAddressInfoDTO();
+        dto.setOrderId(orderAO.getOrderId());
+        dto.setCustAddress(orderAO.getAddress());
+        RpcResponseDTO responseDTO = orderAddressService.updateOrderAddress(dto);
+        log.info("交易系统接收前端修改订单地址请求参数：{} 响应结果：{}", orderAO, responseDTO);
+        return responseDTO;
+    }
+
 }

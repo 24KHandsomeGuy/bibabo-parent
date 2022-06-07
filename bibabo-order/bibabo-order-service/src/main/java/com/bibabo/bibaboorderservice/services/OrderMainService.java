@@ -20,4 +20,6 @@ public interface OrderMainService {
     int updateOrderStatusCancel(long orderId);
 
     int updateOrderIsPayed(long orderId);
+
+    int updateOrderAddress(long orderId, String custAddress);
 }

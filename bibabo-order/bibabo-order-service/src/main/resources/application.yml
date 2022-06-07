@@ -56,6 +56,14 @@ spring:
       seata:
         tx-service-group: bibabo_tx_group
 
+  redis:
+    redisson:
+      config: |
+        singleServerConfig:
+          address: redis://39.107.156.177:6379
+          database: 9
+          password: 123456
+
   datasource:
     connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=500
     driver-class-name: com.mysql.jdbc.Driver

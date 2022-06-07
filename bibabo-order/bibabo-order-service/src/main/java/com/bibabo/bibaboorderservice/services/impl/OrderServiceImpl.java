@@ -4,14 +4,19 @@ import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.bibabo.bibaboorderservice.domain.OrderDetail;
 import com.bibabo.bibaboorderservice.domain.OrderMain;
 import com.bibabo.bibaboorderservice.model.enums.OrderStatusEnum;
+import com.bibabo.bibaboorderservice.model.enums.RedisPrefixEnum;
 import com.bibabo.bibaboorderservice.services.OrderMainService;
+import com.bibabo.order.dto.OrderAddressInfoDTO;
 import com.bibabo.order.dto.OrderDetailModel;
 import com.bibabo.order.dto.OrderModel;
 import com.bibabo.order.dto.OrderRequestDTO;
 import com.bibabo.order.dto.OrderResponseDTO;
 import com.bibabo.order.services.OrderServiceI;
+import com.bibabo.utils.model.RpcResponseDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.redisson.api.RBucket;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -20,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Author: Damon Fu
@@ -42,6 +48,9 @@ public class OrderServiceImpl implements OrderServiceI {
 
     @Autowired
     private OrderMainService orderMainService;
+
+    @Autowired
+    private RedissonClient redissonClient;
 
     @Override
     @SentinelResource(value = "flow-create-order", fallback = "createOrderFallBack")
@@ -148,5 +157,41 @@ public class OrderServiceImpl implements OrderServiceI {
         }
         int rst = orderMainService.updateOrderIsPayed(orderId);
         return new OrderResponseDTO(rst > 0, orderId, rst > 0 ? "支付成功" : "支付失败");
+    }
+
+
+    @Override
+    public RpcResponseDTO<OrderAddressInfoDTO> queryOrderAddress(long orderId) {
+        RBucket<String> addressRBucket = redissonClient.getBucket(RedisPrefixEnum.splicingRedisKey(RedisPrefixEnum.ORDER_ADDRESS, orderId));
+        String address = addressRBucket.get();
+        if (address == null) {
+            OrderMain om = orderMainService.findByOrderId(orderId);
+            if (om == null) {
+                return RpcResponseDTO.<OrderAddressInfoDTO>builder().fail("订单号" + orderId + "不存在").build();
+            }
+            if (om.getCustAddress() == null) {
+                return RpcResponseDTO.<OrderAddressInfoDTO>builder().fail("订单号" + orderId + "地址为空").build();
+            }
+            address = om.getCustAddress();
+            addressRBucket.set(address, RedisPrefixEnum.ORDER_ADDRESS.getExpireSeconds(), TimeUnit.SECONDS);
+        }
+        OrderAddressInfoDTO dto = new OrderAddressInfoDTO();
+        dto.setOrderId(orderId);
+        dto.setCustAddress(address);
+        return RpcResponseDTO.<OrderAddressInfoDTO>builder().success(dto).build();
+    }
+
+
+    @Override
+    public RpcResponseDTO updateOrderAddress(OrderAddressInfoDTO dto) {
+        if (dto == null || dto.getOrderId() == null || dto.getCustAddress() == null) {
+            return RpcResponseDTO.builder().fail("修改订单地址参数为空").build();
+        }
+        // 修改地址后需要删除key，以保证读到的是最新值，交由Canal工程去做
+        int rst = orderMainService.updateOrderAddress(dto.getOrderId(), dto.getCustAddress());
+        if (rst <= 0) {
+            return RpcResponseDTO.builder().fail("订单号" + dto.getOrderId() + "地址修改失败").build();
+        }
+        return RpcResponseDTO.builder().success().build();
     }
 }
