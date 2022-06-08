@@ -124,7 +124,7 @@ seata:
 canal:
   client:
     instances:
-      example:
+      bibabo:
         host: 39.107.156.177
         port: 11111
         batchSize: 1000

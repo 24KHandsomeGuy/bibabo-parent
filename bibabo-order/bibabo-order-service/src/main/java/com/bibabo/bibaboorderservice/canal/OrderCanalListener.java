@@ -26,7 +26,7 @@ public class OrderCanalListener {
     /**
      * 订单修改地址事件
      */
-    @ListenPoint(destination = "example", schema = "bibabo_order", table = {"order_main"}, eventType = CanalEntry.EventType.UPDATE)
+    @ListenPoint(destination = "bibabo", schema = "bibabo_order", table = {"order_main"}, eventType = CanalEntry.EventType.UPDATE)
     public void onUpdateOrderAddressEvent(CanalEntry.EventType eventType, CanalEntry.RowData rowData) {
         log.info("OrderCanalListener on event onUpdateOrderAddressEvent orderId {}", rowData.getAfterColumns(1).getValue());
         rowData.getAfterColumnsList()
