@@ -120,6 +120,16 @@ seata:
   #    password: nacos
   #    application: seata-server
 
+###canal
+canal:
+  client:
+    instances:
+      example:
+        host: 39.107.156.177
+        port: 11111
+        batchSize: 1000
+        clusterEnabled: false
+
 logging:
   level:
     com:
