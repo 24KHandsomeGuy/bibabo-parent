@@ -1,5 +1,6 @@
 package com.bibabo.bibabostockservice.services;
 
+import com.bibabo.bibabostockservice.domain.StockInventory;
 import com.bibabo.stock.dto.StockReqeustDTO;
 
 import java.util.List;
@@ -12,4 +13,6 @@ import java.util.List;
 public interface StockInventoryService {
 
     int batchOccupyStock(List<StockReqeustDTO> reqeustDTOList);
+
+    StockInventory findBySkuId(long skuId);
 }

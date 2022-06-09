@@ -4,6 +4,7 @@ import com.bibabo.bibabostockservice.domain.StockInventory;
 import com.bibabo.bibabostockservice.domain.repository.StockInventoryRepository;
 import com.bibabo.bibabostockservice.services.StockInventoryService;
 import com.bibabo.stock.dto.StockReqeustDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,7 @@ import java.util.List;
  * @Description:
  */
 @Service
+@Slf4j
 public class StockInventoryServiceImpl implements StockInventoryService {
 
     @Autowired
@@ -27,7 +29,7 @@ public class StockInventoryServiceImpl implements StockInventoryService {
     public int batchOccupyStock(List<StockReqeustDTO> reqeustDTOList) {
         // 应该是批量操作， 并发也需要考虑
         for (StockReqeustDTO dto : reqeustDTOList) {
-            // FIXME 同一个条件查询，修改后，居然没读到最新值，怀疑有缓存！！！很变态，后续可以解决下
+            // FIXME 同一个条件查询，修改后，居然没读到最新值，怀疑Hibernate有缓存！！！很变态，后续可以解决下
             StockInventory stockInventory = stockInventoryRepository.findBySkuIdAndWareId(dto.getSkuId(), dto.getWareId());
             BigDecimal availableInventory = stockInventory.getStockNum().subtract(stockInventory.getOrderBookNum());
             BigDecimal remainingInventory = availableInventory.subtract(new BigDecimal(dto.getSkuNum()));
@@ -39,5 +41,10 @@ public class StockInventoryServiceImpl implements StockInventoryService {
             int rst = stockInventoryRepository.setOrderBookNumFor(stockInventory.getId(), new BigDecimal(dto.getSkuNum()));
         }
         return 1;
+    }
+
+    @Override
+    public StockInventory findBySkuId(long skuId) {
+        return stockInventoryRepository.findBySkuId(skuId);
     }
 }

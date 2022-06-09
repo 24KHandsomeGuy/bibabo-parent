@@ -27,4 +27,6 @@ public interface StockInventoryRepository extends JpaRepository<StockInventory, 
     /*@Modifying
     @Query(value = "update StockInventory set orderBookNum = ?2 where id = ?1")
     int setOrderBookNumFor(long id, BigDecimal orderBookNum);*/
+
+    StockInventory findBySkuId(long skuId);
 }
