@@ -44,6 +44,9 @@ spring:
           address: redis://39.107.156.177:6379
           database: 10
           password: 123456
+          subscriptionConnectionPoolSize: 2
+          connectionMinimumIdleSize: 2
+          connectionPoolSize: 4
 
   datasource:
     connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=500

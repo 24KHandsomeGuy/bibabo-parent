@@ -52,6 +52,10 @@ public class OrderServiceImpl implements OrderServiceI {
     @Autowired
     private RedissonClient redissonClient;
 
+    @Autowired
+    OrderBloomfilterSerivce orderBloomfilterSerivce;
+
+
     @Override
     @SentinelResource(value = "flow-create-order", fallback = "createOrderFallBack")
     public OrderResponseDTO createOrder(OrderRequestDTO dto) {
@@ -123,10 +127,24 @@ public class OrderServiceImpl implements OrderServiceI {
     @Override
     @SentinelResource(value = "flow-query-order", fallback = "queryOrderFailBack")
     public OrderModel queryOrderById(long orderId) {
+        boolean isInBloomfilter = orderBloomfilterSerivce.checkIsInBloomfilter(orderId);
+        if (!isInBloomfilter) {
+            return new OrderModel();
+        }
+
         OrderMain om = orderMainService.findByOrderId(orderId);
         OrderModel orderModel = new OrderModel();
         Optional<OrderMain> optional = Optional.ofNullable(om);
-        optional.ifPresent(orderMain -> BeanUtils.copyProperties(orderMain, orderModel));
+        optional.ifPresent(orderMain -> {
+            BeanUtils.copyProperties(orderMain, orderModel);
+            List<OrderDetailModel> orderDetailModelList = new ArrayList<>();
+            orderModel.setOrderDetailModelList(orderDetailModelList);
+            orderMain.getOrderDetailList().forEach(orderDetail -> {
+                OrderDetailModel orderDetailModel = new OrderDetailModel();
+                BeanUtils.copyProperties(orderDetail, orderDetailModel);
+                orderDetailModelList.add(orderDetailModel);
+            });
+        });
         return orderModel;
     }
 
@@ -187,7 +205,7 @@ public class OrderServiceImpl implements OrderServiceI {
         if (dto == null || dto.getOrderId() == null || dto.getCustAddress() == null) {
             return RpcResponseDTO.builder().fail("修改订单地址参数为空").build();
         }
-        // TODO 修改地址后需要删除key，以保证读到的是最新值，交由Canal做
+        // 修改地址后需要删除key，以保证读到的是最新值，交由Canal做
         int rst = orderMainService.updateOrderAddress(dto.getOrderId(), dto.getCustAddress());
         if (rst <= 0) {
             return RpcResponseDTO.builder().fail("订单号" + dto.getOrderId() + "地址修改失败").build();

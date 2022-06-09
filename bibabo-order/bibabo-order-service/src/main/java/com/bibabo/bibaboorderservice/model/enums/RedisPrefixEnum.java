@@ -9,6 +9,7 @@ package com.bibabo.bibaboorderservice.model.enums;
 public enum RedisPrefixEnum {
 
     ORDER_ADDRESS("ORDER_ADDRESS", "订单地址redisKey前缀", 60 * 60 * 24),
+    ORDER_BLOOMFILTER("ORDER_BLOOMFILTER", "订单查询布隆过滤器", 0),
     ;
 
     private String prefix;
