@@ -7,6 +7,7 @@ import com.bibabo.bibabotrade.model.vo.CreateOrderVO;
 import com.bibabo.bibabotrade.model.vo.OrderPayVO;
 import com.bibabo.bibabotrade.services.CreateOrderServiceI;
 import com.bibabo.bibabotrade.services.OrderAddressServiceI;
+import com.bibabo.bibabotrade.services.queue.QueueManager;
 import com.bibabo.bibabotrade.utils.NumberGenerator;
 import com.bibabo.order.dto.OrderAddressInfoDTO;
 import com.bibabo.order.dto.OrderModel;
@@ -55,6 +56,10 @@ public class OrderController {
         long orderId = numberGenerator.generateOrderId();
         orderAO.setOrderId(orderId);
         orderAO.setCreateDate(now);
+
+        // 上报日志
+        QueueManager.getReportLogQueue().add(orderAO.toString());
+
         CreateOrderVO vo = new CreateOrderVO(false, orderId, "创建失败");
         // 创建订单，多服务中、任一服务失败则抛出异常，全局分布式事务回滚（创建订单使用强一致事务）
         try {
