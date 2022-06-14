@@ -1,4 +1,4 @@
-package com.bibabo.bibaboorderservice.spring.annotion;
+package com.bibabo.bibaboorderservice.util.spring;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;

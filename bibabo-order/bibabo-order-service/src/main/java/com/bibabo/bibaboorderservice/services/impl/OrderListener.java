@@ -3,6 +3,9 @@ package com.bibabo.bibaboorderservice.services.impl;
 import com.bibabo.bibaboorderservice.domain.OrderDetail;
 import com.bibabo.bibaboorderservice.domain.OrderMain;
 import com.bibabo.bibaboorderservice.services.OrderMainService;
+import com.bibabo.bibaboorderservice.services.timewheel.GrantOverTimeCouponTask;
+import com.bibabo.bibaboorderservice.util.spring.SpringBeanUtils;
+import com.bibabo.bibaboorderservice.util.timewheel.WheelTimerFactory;
 import com.bibabo.order.dto.OrderModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -13,10 +16,12 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author fukuixiang
@@ -86,6 +91,7 @@ public class OrderListener {
                 om.getCustId();
             }).thenApply(Void -> {// TODO 1.5 订单的拆分
                 List<OrderModel> orderModelList = new ArrayList<>();
+                orderModelList.add(omMsg);
                 return orderModelList;
             });
 
@@ -106,6 +112,23 @@ public class OrderListener {
             splitOrderCompletableFuture.thenAcceptAsync(orderModelList -> {
 
             }, executor);
+
+            // 4.1 将配送超时随机赠送优惠券写入时间轮，超时发放劵
+            splitOrderCompletableFuture.thenAcceptAsync(orderModelList -> {
+                orderModelList.forEach(omm -> {
+                    GrantOverTimeCouponTask task = null;
+                    try {
+                        task = SpringBeanUtils.<GrantOverTimeCouponTask>getBean("grantOverTimeCouponTask", GrantOverTimeCouponTask.class);
+                    } catch (RuntimeException e) {
+                        log.error("", e);
+                    }
+
+                    task.setOrderId(omm.getOrderId());
+                    task.setCustId(omm.getCustId());
+                    long delay = omm.getExpectShipmentTime().getTime() - new Date().getTime();
+                    WheelTimerFactory.FIVE_SECONDS_WHEEL_TIMER.newTimeout(task, delay, TimeUnit.MILLISECONDS);
+                });
+            });
         });
     }
 

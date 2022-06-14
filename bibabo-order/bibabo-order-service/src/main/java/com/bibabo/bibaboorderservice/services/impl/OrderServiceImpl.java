@@ -14,6 +14,7 @@ import com.bibabo.order.dto.OrderResponseDTO;
 import com.bibabo.order.services.OrderServiceI;
 import com.bibabo.utils.model.RpcResponseDTO;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
@@ -95,6 +96,7 @@ public class OrderServiceImpl implements OrderServiceI {
                 .orderDate(now)
                 .bookDate(now)
                 .createDate(now)
+                .expectShipmentTime(orderModel.getExpectShipmentTime() == null ? DateUtils.addMinutes(new Date(), 2) : orderModel.getExpectShipmentTime())
                 .build();
     }
 

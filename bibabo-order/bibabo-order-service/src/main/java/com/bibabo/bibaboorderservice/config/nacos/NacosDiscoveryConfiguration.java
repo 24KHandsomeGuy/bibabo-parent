@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bibabo.bibaboorderservice.nacosdiscovery;
+package com.bibabo.bibaboorderservice.config.nacos;
 
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.Configuration;

@@ -1,4 +1,4 @@
-package com.bibabo.bibaboorderservice.sentinel;
+package com.bibabo.bibaboorderservice.config.sentinel;
 
 import com.alibaba.cloud.sentinel.SentinelProperties;
 import com.alibaba.cloud.sentinel.datasource.config.NacosDataSourceProperties;

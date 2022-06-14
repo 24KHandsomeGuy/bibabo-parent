@@ -21,7 +21,7 @@ public class OrderModel extends BaseDTO {
     /**
      * 顾客id 用户系统主键
      */
-    private String custId;
+    private Long custId;
 
 
     private Date createDate;
@@ -40,4 +40,9 @@ public class OrderModel extends BaseDTO {
      * 是否已支付
      */
     private Short isPayed;
+
+    /**
+     * 期望配送时间
+     */
+    private Date expectShipmentTime;
 }

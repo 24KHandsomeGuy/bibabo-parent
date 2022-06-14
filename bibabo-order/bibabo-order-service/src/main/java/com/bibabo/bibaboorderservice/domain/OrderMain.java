@@ -98,6 +98,10 @@ public class OrderMain extends BaseEntity {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd hh:mm:ss")
     private Date bookDate;
 
+    @Column(name = "expect_shipment_time")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd hh:mm:ss")
+    private Date expectShipmentTime;
+
     @Column(name = "create_date")
     @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm:ss")
     private Date createDate;
