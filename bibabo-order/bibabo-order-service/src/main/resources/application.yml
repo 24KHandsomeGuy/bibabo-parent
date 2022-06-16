@@ -71,8 +71,8 @@ spring:
     connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=500
     driver-class-name: com.mysql.jdbc.Driver
     filters: stat
-    initialSize: 5
-    maxActive: 20
+    initialSize: 2
+    maxActive: 5
     maxPoolPreparedStatementPerConnectionSize: 20
     maxWait: 60000
     minEvictableIdleTimeMillis: 300000
