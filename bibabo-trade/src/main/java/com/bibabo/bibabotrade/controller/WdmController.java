@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class WdmController {
 
 
-    @DubboReference(check = true, timeout = 300000)
+    @DubboReference(check = false, timeout = 300000)
     ISkuDubboService skuDubboService;
 
 

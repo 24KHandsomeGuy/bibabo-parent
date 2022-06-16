@@ -3,6 +3,8 @@ package com.bibabo.bibabotrade.model.vo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * @author fukuixiang
  * @date 2022/4/7
@@ -11,7 +13,7 @@ import lombok.Data;
  */
 @Data
 @AllArgsConstructor
-public class CreateOrderVO {
+public class CreateOrderVO implements Serializable {
 
     private Boolean success;
 

@@ -58,7 +58,7 @@ public class OrderController {
         orderAO.setCreateDate(now);
 
         // 上报日志
-        QueueManager.getReportLogQueue().add(orderAO.toString());
+        QueueManager.getReportLogQueue().add(orderAO);
 
         CreateOrderVO vo = new CreateOrderVO(false, orderId, "创建失败");
         // 创建订单，多服务中、任一服务失败则抛出异常，全局分布式事务回滚（创建订单使用强一致事务）
@@ -68,6 +68,10 @@ public class OrderController {
             log.error(String.format("订单号%d，创建订单失败%s", orderId, e.getMessage()), e);
             vo.setErrorMsg("创建失败：" + e.getMessage());
         }
+
+        // 上报日志
+        QueueManager.getReportLogQueue().add(vo);
+
         // 创建成功发送一条支付超时检查消息，支付超时需要自动取消订单
         // 在这个地方发送消息，可能会存在消息的丢失，所以作为补偿，还需要有一个job定时抓取支付超时订单取消掉
         if (vo.getSuccess()) {

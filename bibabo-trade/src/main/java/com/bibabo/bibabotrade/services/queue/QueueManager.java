@@ -14,9 +14,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 @Slf4j
 public abstract class QueueManager {
 
-    private static final BlockingQueue<String> REPORT_LOG_QUEUE = new LinkedBlockingQueue<>();
+    private static final BlockingQueue<Object> REPORT_LOG_QUEUE = new LinkedBlockingQueue<>();
 
-    public static BlockingQueue<String> getReportLogQueue() {
+    public static BlockingQueue<Object> getReportLogQueue() {
         return REPORT_LOG_QUEUE;
     }
 }

@@ -42,7 +42,6 @@ public class SkuMainCanalListener {
             StringBuilder skuMainJson = new StringBuilder("{");
             int j = 0;
             for (CanalEntry.Column column : rowData.getAfterColumnsList()) {
-                // 不考虑布尔
                 boolean nextCharToUpper = false;
                 StringBuilder fieldName = new StringBuilder();
                 int i = 0;
