@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author fukuixiang
@@ -21,8 +22,8 @@ public class SkuMainServiceImpl implements ISkuMainService {
     SkuMainRepository skuMainRepository;
 
     @Override
-    public SkuMain findById(long skuId) {
-        return skuMainRepository.findById(skuId).get();
+    public Optional<SkuMain> findById(long skuId) {
+        return skuMainRepository.findById(skuId);
     }
 
     @Override

@@ -32,11 +32,11 @@ public class WdmController {
     }
 
     @GetMapping("/sku")
-    public RpcResponseDTO<SkuQueryResponse> getSkuInfosByName(@RequestParam String skuName) {
+    public RpcResponseDTO<SkuQueryResponse> getSkuInfosByName(@RequestParam String skuName, @RequestParam Integer from, @RequestParam Integer size) {
         SkuQueryRequest request = new SkuQueryRequest();
         request.setSkuName(skuName);
-        request.setFrom(0);
-        request.setSize(5);
+        request.setFrom(from);
+        request.setSize(size);
         return skuDubboService.findSkuByConditions(request);
     }
 }

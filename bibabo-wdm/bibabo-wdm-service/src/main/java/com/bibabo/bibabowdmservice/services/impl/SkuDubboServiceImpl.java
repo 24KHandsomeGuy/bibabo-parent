@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author fukuixiang
@@ -49,7 +50,7 @@ public class SkuDubboServiceImpl implements ISkuDubboService {
     RestHighLevelClient restHighLevelClient;
 
 
-    @SneakyThrows
+    /*@SneakyThrows
     @PostConstruct
     private void postData2Es() {
         List<SkuMain> skuMainList = skuMainService.findAll();
@@ -66,7 +67,7 @@ public class SkuDubboServiceImpl implements ISkuDubboService {
         });
         BulkResponse bulkResponse = restHighLevelClient.bulk(bulkRequest, RequestOptions.DEFAULT);
         log.info("批量插入，Took:{}，Items:{}", bulkResponse.getTook(), bulkResponse.getItems());
-    }
+    }*/
 
 
     @SneakyThrows
@@ -74,7 +75,11 @@ public class SkuDubboServiceImpl implements ISkuDubboService {
     public RpcResponseDTO<SkuQueryResponse> findSkuByConditions(SkuQueryRequest skuQueryRequest) {
         // skuId读单个
         if (skuQueryRequest.getSkuId() != null) {
-            SkuMain skuMain = skuMainService.findById(skuQueryRequest.getSkuId());
+            Optional<SkuMain> optionalSkuMain = skuMainService.findById(skuQueryRequest.getSkuId());
+            SkuMain skuMain = optionalSkuMain.orElse(null);
+            if (skuMain == null) {
+                return RpcResponseDTO.<SkuQueryResponse>builder().fail(skuQueryRequest.getSkuId() + "不存在").build();
+            }
             SkuQueryResponse response = new SkuQueryResponse();
             BeanUtils.copyProperties(skuMain, response);
             return RpcResponseDTO.<SkuQueryResponse>builder().success(response).build();

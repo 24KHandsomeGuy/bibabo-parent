@@ -3,6 +3,7 @@ package com.bibabo.bibabowdmservice.services;
 import com.bibabo.bibabowdmservice.domain.SkuMain;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author fukuixiang
@@ -12,7 +13,7 @@ import java.util.List;
  */
 public interface ISkuMainService {
 
-    SkuMain findById(long skuId);
+    Optional<SkuMain> findById(long skuId);
 
     List<SkuMain> findAll();
 }

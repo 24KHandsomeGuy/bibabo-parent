@@ -1,5 +1,6 @@
 package com.bibabo.bibabowdmservice;
 
+import com.xpand.starter.canal.annotation.EnableCanalClient;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -10,6 +11,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @description
  */
 @SpringBootApplication
+@EnableCanalClient
 public class BibaboWdmServiceApplication {
 
     public static void main(String[] args) {
