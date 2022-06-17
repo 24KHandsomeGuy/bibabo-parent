@@ -54,6 +54,12 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
+        <!-- sleuth zipkin -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-zipkin</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

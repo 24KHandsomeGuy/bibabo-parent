@@ -93,6 +93,14 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  zipkin:
+    base-url: http://39.107.156.177:9411
+  sleuth:
+    web:
+      client:
+        enabled: true
+    sampler:
+      probability: 1
 
 dubbo:
   cloud:
@@ -103,6 +111,10 @@ dubbo:
     port: -1
   scan:
     base-packages: com.bibabo.bibaboorderservice
+  provider:
+    filter: tracing
+  consumer:
+    filter: tracing
 
 ###seata
 seata:

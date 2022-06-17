@@ -45,5 +45,14 @@ spring:
       scg:
         order: -100
 
+  zipkin:
+    base-url: http://39.107.156.177:9411
+  sleuth:
+    web:
+      client:
+        enabled: true
+    sampler:
+      probability: 1
+
   main:
     allow-bean-definition-overriding: true

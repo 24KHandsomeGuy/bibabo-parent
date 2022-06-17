@@ -59,3 +59,6 @@ Wdm商品从ES中查询，Mysql插入修改数据，Canal同步到ES
 
 ### 2022-06-16
 所有系统日志上报到ES，index为service-bibabo-log，Kibana日志分析
+
+### 2022-06-17
+所有系统集成Zipkin
