@@ -9,10 +9,14 @@ import com.bibabo.bibabotrade.services.CreateOrderServiceI;
 import com.bibabo.bibabotrade.services.OrderAddressServiceI;
 import com.bibabo.bibabotrade.services.queue.QueueManager;
 import com.bibabo.bibabotrade.utils.NumberGenerator;
+import com.bibabo.bibabotrade.utils.RedisRateLimiterEnum;
 import com.bibabo.order.dto.OrderAddressInfoDTO;
 import com.bibabo.order.dto.OrderModel;
 import com.bibabo.utils.model.RpcResponseDTO;
+import com.bibabo.utils.monitor.Profiler;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RRateLimiter;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,6 +38,7 @@ import java.util.List;
 @Slf4j
 public class OrderController {
 
+
     @Autowired
     private NumberGenerator numberGenerator;
 
@@ -46,9 +51,20 @@ public class OrderController {
     @Autowired
     private OrderAddressServiceI orderAddressService;
 
+    @Autowired
+    private RedissonClient redissonClient;
+
 
     @PostMapping("/order")
     public CreateOrderVO createOrder(@RequestBody OrderAO orderAO) {
+        RRateLimiter rateLimiter = redissonClient.getRateLimiter(RedisRateLimiterEnum.CREATE_ORDER.getResource());
+        boolean limitRst = rateLimiter.tryAcquire();
+        if (!limitRst) {
+            log.info("createOrder rate limit:{}", limitRst);
+            return new CreateOrderVO(false, null, "创建失败，被限流");
+        }
+
+        Profiler.begin();
         log.info("交易系统接收前端下单请求参数：{} ", orderAO);
 
         // 组装创建订单业务DTO。获取订单号、填充时间
@@ -59,6 +75,7 @@ public class OrderController {
 
         // 上报日志
         QueueManager.getReportLogQueue().add(orderAO);
+        log.info("交易系统创建订单前置准备耗时:{}", Profiler.end());
 
         CreateOrderVO vo = new CreateOrderVO(false, orderId, "创建失败");
         // 创建订单，多服务中、任一服务失败则抛出异常，全局分布式事务回滚（创建订单使用强一致事务）
@@ -77,6 +94,8 @@ public class OrderController {
         if (vo.getSuccess()) {
             messageSender.sendPaymentTimeOutCheckMsg(orderId);
         }
+
+        log.info("交易系统创建订单总耗时:{}", Profiler.end());
 
         log.info("交易系统接收前端下单请求参数：{} 响应结果：{}", orderAO, vo);
         return vo;

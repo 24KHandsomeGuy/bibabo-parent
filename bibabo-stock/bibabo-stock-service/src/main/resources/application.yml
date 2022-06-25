@@ -75,7 +75,7 @@ spring:
       ddl-auto: update
     show-sql: true
   zipkin:
-    base-url: http://39.107.156.177:9411
+    base-url: http://82.156.216.254:9411
   sleuth:
     web:
       client:

@@ -11,6 +11,7 @@ import com.bibabo.order.dto.OrderResponseDTO;
 import com.bibabo.stock.dto.OccupyStockResponseDTO;
 import com.bibabo.stock.dto.StockReqeustDTO;
 import com.bibabo.stock.services.StockServiceI;
+import com.bibabo.utils.monitor.Profiler;
 import io.seata.spring.annotation.GlobalTransactional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -63,12 +64,14 @@ public class CreateOrderServiceImpl implements CreateOrderServiceI {
         requestDTO.setOrderModel(orderModel);
         orderModel.setOrderDetailModelList(orderDetailModelList);
         OrderResponseDTO responseDTO = orderService.createOrder(requestDTO);
+        log.info("交易系统创建订单，订单服务调用耗时:{}", Profiler.end());
         if (null == responseDTO || !responseDTO.getSuccess()) {
             throw new RuntimeException("订单创建失败" + responseDTO.getErrorMessage());
         }
 
         // 占用库存
         OccupyStockResponseDTO occupyStockResponseDTO = stockService.occupyStock(stockReqeustDTOList);
+        log.info("交易系统创建订单，库存服务调用耗时:{}", Profiler.end());
         if (occupyStockResponseDTO.getRtnStatus() == -1) {
             throw new RuntimeException("占用库存失败" + occupyStockResponseDTO.getRtnMsg());
         }
