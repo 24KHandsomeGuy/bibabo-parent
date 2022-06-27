@@ -71,6 +71,16 @@ spring:
         enabled: true
     sampler:
       probability: 1
+  redis:
+    redisson:
+      config: |
+        singleServerConfig:
+          address: redis://39.107.156.177:6379
+          database: 11
+          password: 123456
+          subscriptionConnectionPoolSize: 2
+          connectionMinimumIdleSize: 2
+          connectionPoolSize: 4
 
 dubbo:
   cloud:
@@ -88,13 +98,14 @@ dubbo:
 
 logging:
   level:
-    com:
-      alibaba:
-        cloud:
-          stream:
-            binder:
-              rocketmq: DEBUG
-          nacos:
-            client: debug
+    root: info
+    #com:
+     # alibaba:
+      #  cloud:
+       #   stream:
+        #    binder:
+         #     rocketmq: DEBUG
+          #nacos:
+           # client: debug
 server:
   port: 10089
