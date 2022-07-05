@@ -19,6 +19,7 @@
         <module>bibabo-stock</module>
         <module>bibabo-wdm</module>
         <module>bibabo-marketing</module>
+        <module>bibabo-user</module>
     </modules>
 
     <properties>

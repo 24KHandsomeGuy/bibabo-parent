@@ -4,6 +4,10 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 /**
  * @Author: Damon Fu
  * @Date: 2022/6/25 20:37
@@ -39,4 +43,15 @@ public class SpringContext implements ApplicationContextAware {
         return applicationContext.getBean(name, clazz);
     }
 
+    public static <T> List<T> getBeansOfType(Class<T> clazz) {
+        Map<String, T> beansMap = applicationContext.getBeansOfType(clazz);
+        if (beansMap.isEmpty()) {
+            return null;
+        }
+        List<T> beans = new ArrayList<>(beansMap.size());
+        for (Map.Entry<String, T> entry : beansMap.entrySet()) {
+            beans.add(entry.getValue());
+        }
+        return beans;
+    }
 }

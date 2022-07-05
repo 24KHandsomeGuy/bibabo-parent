@@ -1,6 +1,9 @@
 package com.bibabo.bibabomarketingservice.model.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * @Author: Damon Fu
@@ -8,13 +11,18 @@ import lombok.Data;
  * @Description:
  */
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ActivityDTO extends BaseDTO {
 
     private Long activityId;
 
-    private Long userId;
+    private Long custId;
 
     private Long couponId;
 
-    private String skuIds;
+    private Integer type;
+
+    private Long giftRecordId;
 }

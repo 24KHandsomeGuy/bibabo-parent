@@ -84,7 +84,7 @@ spring:
 
 dubbo:
   cloud:
-    subscribed-services: bibabo-marketing-service
+    subscribed-services: bibabo-user-service
   protocol:
     id: dubbo
     name: dubbo

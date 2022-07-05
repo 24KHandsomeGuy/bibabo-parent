@@ -17,7 +17,6 @@
     <modules>
         <module>bibabo-marketing-api</module>
         <module>bibabo-marketing-service</module>
-        <module>bibabo-marketing-service</module>
     </modules>
 
     <dependencies>

@@ -31,9 +31,8 @@ public class MessageSenderService {
      * @param <T>
      * @return
      */
-    public <T> boolean sendMarketingMsg(ActivityDTO msg, int tag) {
+    public <T> boolean sendMarketingMsg(ActivityDTO msg) {
         MessageBuilder builder = MessageBuilder.withPayload(msg)
-                .setHeader(MessageConst.PROPERTY_TAGS, tag)
                 .setHeader(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON);
         Message message = builder.build();
         return orderSource.outputMarketing().send(message);

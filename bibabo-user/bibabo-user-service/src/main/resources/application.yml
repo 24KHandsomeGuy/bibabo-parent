@@ -1,0 +1,95 @@
+management:
+  endpoint:
+    shutdown:
+      enabled: true
+    health:
+      enabled: true
+      show-details: always
+  endpoints:
+    web:
+      base-path: /monitor
+      exposure:
+        include: '*'
+spring:
+  application:
+    name: bibabo-user-service
+  main:
+    allow-bean-definition-overriding: true
+  cloud:
+    nacos:
+      discovery:
+        namespace: public
+        server-addr: 114.116.44.130:8848
+
+  datasource:
+    connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=500
+    driver-class-name: com.mysql.jdbc.Driver
+    filters: stat
+    initialSize: 2
+    maxActive: 5
+    maxPoolPreparedStatementPerConnectionSize: 20
+    maxWait: 60000
+    minEvictableIdleTimeMillis: 300000
+    minIdle: 5
+    username: root
+    password: 123456
+    poolPreparedStatements: true
+    testOnBorrow: false
+    testOnReturn: false
+    testWhileIdle: true
+    timeBetweenEvictionRunsMillis: 60000
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://114.116.44.130:3306/bibabo_user?characterEncoding=utf-8&serverTimezone=GMT%2B8
+    useGlobalDataSourceStat: true
+    validationQuery: SELECT 1 FROM DUAL
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL55Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  zipkin:
+    base-url: http://82.156.216.254:9411
+  sleuth:
+    web:
+      client:
+        enabled: true
+    sampler:
+      probability: 1
+  redis:
+    redisson:
+      config: |
+        singleServerConfig:
+          address: redis://39.107.156.177:6379
+          database: 12
+          password: 123456
+          subscriptionConnectionPoolSize: 2
+          connectionMinimumIdleSize: 2
+          connectionPoolSize: 4
+
+dubbo:
+  cloud:
+    subscribed-services: bibabo-user-service
+  protocol:
+    id: dubbo
+    name: dubbo
+    port: -1
+  scan:
+    base-packages: com.bibabo.bibabouserservice
+  provider:
+    filter: tracing
+  consumer:
+    filter: tracing
+
+logging:
+  level:
+    root: info
+    #com:
+     # alibaba:
+      #  cloud:
+       #   stream:
+        #    binder:
+         #     rocketmq: DEBUG
+          #nacos:
+           # client: debug
+server:
+  port: 10090

@@ -6,12 +6,21 @@ package com.bibabo.bibabomarketingservice.model.enums;
  * @Description:
  */
 public enum MessageTypeEnum {
-    QUEUE_ACTIVITY("marketingActivityProcessRunner", 1),
-    QUEUE_GRANT_COUPONS("grantCouponProcessRunner", 2);
+    QUEUE_ACTIVITY(ProcessorEnum.ACTIVITY.getName(), 1),
+    QUEUE_GRANT_COUPONS(ProcessorEnum.GRANT_COUPON.getName(), 2);
 
     MessageTypeEnum(String processName, Integer type) {
         this.processName = processName;
         this.type = type;
+    }
+
+    public static String findProcessNameByType(int type) {
+        for (MessageTypeEnum value : MessageTypeEnum.values()) {
+            if (value.getType() == type) {
+                return value.getProcessName();
+            }
+        }
+        return null;
     }
 
     public static int findTypeByProcessName(String processName) {

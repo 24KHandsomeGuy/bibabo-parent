@@ -86,3 +86,5 @@ bibabo营销系统
 1.在Spring cloud stream input 和 output之间放置清空队列发送到远程MQ任务
 2.消费者完成
 
+### 2022-07-05
+十万TPS发劵已完成

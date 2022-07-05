@@ -9,8 +9,8 @@ import org.redisson.api.RateType;
  * @Description:
  */
 public enum RedisRateLimiterEnum {
-    QUEUE_ACTIVITY("QUEUE_ACTIVITY", RateType.OVERALL, 120, 1, RateIntervalUnit.MINUTES),
-    QUEUE_GRANT_COUPONS("QUEUE_GRANT_COUPONS", RateType.OVERALL, 30, 1, RateIntervalUnit.MINUTES);
+    QUEUE_ACTIVITY("QUEUE_ACTIVITY", RateType.OVERALL, 5, 1, RateIntervalUnit.MINUTES),
+    QUEUE_GRANT_COUPONS("QUEUE_GRANT_COUPONS", RateType.OVERALL, 2, 1, RateIntervalUnit.MINUTES);
 
     RedisRateLimiterEnum(String resource, RateType rateType, long rate, long rateInterval, RateIntervalUnit rateIntervalUnit) {
         this.resource = resource;

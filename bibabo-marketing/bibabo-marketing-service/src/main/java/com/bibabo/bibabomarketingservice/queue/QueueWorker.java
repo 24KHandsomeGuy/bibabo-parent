@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class QueueWorker {
 
-    private static int totalServiceCount = 3;
+    private static int totalServiceCount = 2;
 
     private String processorName;
 
@@ -45,6 +45,20 @@ public class QueueWorker {
     @Autowired
     private RedissonClient redissonClient;
 
+
+    public void drainToRocketMq() {
+        // 把queue中剩余的元素作为消息发送到rocketmq中。tag作为类型区分是一层队列缓冲"活动决策"是否通过、还是二层队列缓冲"营销资产系统"承载能力
+        LinkedList<ActivityDTO> elementList = new LinkedList<>();
+        int drainCount = queueManager.getBlockingQueue(processorName).drainTo(elementList);
+        log.info("processorName:{} discover spring container is closed, will drain queue element to rocketMq, element size:{}", processorName, drainCount);
+        if (elementList.size() > 0) {
+            elementList.parallelStream().forEach(dto -> {
+                dto.setType(MessageTypeEnum.findTypeByProcessName(processorName));
+                messageSenderService.sendMarketingMsg(dto);
+            });
+        }
+    }
+
     private void start() {
         threadPoolExecutor = new CpuCoresThreadPoolExecutor();
         workerThread = new Thread(new FetchTaskThread(), "Thread-" + processorName);
@@ -62,14 +76,6 @@ public class QueueWorker {
         public void run() {
             while (true) {
                 if (SpringContext.isSpringClosedSignal()) {
-                    // 把queue中剩余的元素作为消息发送到rocketmq中。tag作为类型区分是一层队列缓冲"活动决策"是否通过、还是二层队列缓冲"营销资产系统"承载能力
-                    LinkedList<ActivityDTO> elementList = new LinkedList<>();
-                    int drainCount = queueManager.getBlockingQueue(processorName).drainTo(elementList);
-                    if (elementList.size() > 0) {
-                        elementList.parallelStream().forEach(dto -> {
-                            messageSenderService.sendMarketingMsg(dto, MessageTypeEnum.findTypeByProcessName(processorName));
-                        });
-                    }
                     break;
                 }
                 try {
@@ -110,5 +116,9 @@ public class QueueWorker {
     public QueueWorker(String processorName, RedisRateLimiterEnum redisRateLimiterEnum) {
         this.processorName = processorName;
         this.redisRateLimiterEnum = redisRateLimiterEnum;
+    }
+
+    public String getProcessorName() {
+        return processorName;
     }
 }

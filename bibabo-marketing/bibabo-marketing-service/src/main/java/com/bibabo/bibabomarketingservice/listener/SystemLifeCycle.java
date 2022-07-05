@@ -2,12 +2,16 @@ package com.bibabo.bibabomarketingservice.listener;
 
 import com.bibabo.bibabomarketingservice.model.enums.RedisRateLimiterEnum;
 import com.bibabo.bibabomarketingservice.common.SpringContext;
+import com.bibabo.bibabomarketingservice.queue.QueueWorker;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RRateLimiter;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Queue;
 
 /**
  * @Author: Damon Fu
@@ -46,6 +50,10 @@ public class SystemLifeCycle implements SmartLifecycle {
             log.info("SystemLifeCycle stop");
             // 把queue中剩余的元素作为消息发送到rocketmq中。tag作为类型区分是一层队列缓冲"活动决策"是否通过、还是二层队列缓冲"营销资产系统"承载能力
             SpringContext.springClosed();
+            List<QueueWorker> queueWorkerList = SpringContext.getBeansOfType(QueueWorker.class);
+            for (QueueWorker queueWorker : queueWorkerList) {
+                queueWorker.drainToRocketMq();
+            }
             running = false;
         }
     }
