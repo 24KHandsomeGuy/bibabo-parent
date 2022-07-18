@@ -8,11 +8,13 @@ import com.bibabo.bibabouserservice.model.enums.RedisPrefixEnum;
 import com.bibabo.user.dto.GrantCouponRequestDTO;
 import com.bibabo.user.services.GrantCouponService;
 import com.bibabo.utils.model.RpcResponseDTO;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.redisson.api.RAtomicLong;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.dao.DuplicateKeyException;
 
 import java.util.Date;
@@ -25,7 +27,10 @@ import java.util.Optional;
  */
 @DubboService
 @Slf4j
+@RequiredArgsConstructor
 public class GrantCouponServiceImpl implements GrantCouponService {
+
+    private final ApplicationContext applicationContext;
 
     @Autowired
     private CouponRepository couponRepository;
@@ -75,6 +80,12 @@ public class GrantCouponServiceImpl implements GrantCouponService {
             log.info("优惠劵couponId:{}, 顾客id:{} 已经发放优惠劵", dto.getCouponId(), dto.getCustId(), de);
             return RpcResponseDTO.builder().fail("优惠劵couponId:" + dto.getCouponId() + ",顾客id:" + dto.getCustId() + "已经发放优惠劵*").build();
         }
+
+        // 采用Spring的Event解耦
+        // 发劵成功后同步发送短信通知用户
+        applicationContext.publishEvent(new GrantCouponEvent(this, dto.getCustId(), dto.getCouponId()));
+        // 异步发送邮箱
+        applicationContext.publishEvent(new GrantCouponEventAsync(dto.getCustId(), dto.getCouponId()));
 
         return RpcResponseDTO.builder().success().build();
     }
