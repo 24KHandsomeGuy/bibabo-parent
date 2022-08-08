@@ -12,6 +12,7 @@ import com.bibabo.utils.model.RpcResponseDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 
 import java.util.Date;
 
@@ -44,7 +45,13 @@ public class MarketingActivityServiceImpl implements MarketingActivityServiceI {
                 .giftStatus(GiftStatusEnum.NEW.getStatus())
                 .createDate(new Date())
                 .build();
-        GiftCustRecord giftCustRecordDB = giftCustRecordRepository.save(giftCustRecord);
+        // 唯一键冲突异常捕获，返回失败
+        GiftCustRecord giftCustRecordDB = null;
+        try {
+            giftCustRecordDB = giftCustRecordRepository.save(giftCustRecord);
+        } catch (DuplicateKeyException e) {
+            return RpcResponseDTO.<Boolean>builder().fail("custId" + dto.getCustId() + " has joined activityId " + dto.getActivityId()).build();
+        }
 
         // 发到本地queue中
         boolean rst = queueManager.getBlockingQueue(ProcessorEnum.ACTIVITY.getName()).offer(ActivityDTO.builder().activityId(dto.getActivityId()).custId(dto.getCustId()).giftRecordId(giftCustRecordDB.getId()).build());

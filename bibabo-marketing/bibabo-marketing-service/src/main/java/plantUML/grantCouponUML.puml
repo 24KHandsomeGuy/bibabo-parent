@@ -1,0 +1,64 @@
+@startuml
+title 营销、卡劵系统发劵
+actor frontUser
+
+participant "front" as front
+participant "geteway" as geteway
+participant "bibabo-marketing" as bibaboMarketing
+participant "bibabo-marketing-activity-queue" as activityQueue
+participant "MarketingActivityProcessRunner" as marketingActivityProcessRunner
+participant "bibabo-marketing-grantCoupon-queue" as grantCouponQueue
+participant "GrantCouponProcessRunner" as grantCouponProcessRunner
+database "Mysql-Marketing" as mysqlMarketing
+participant "bibabo-user" as bibaboUser
+database "Redis" as redis
+
+autonumber
+frontUser-> front:C端用户点击领取优惠劵
+activate front
+front-> geteway:前端将发劵请求打到后端网关
+activate geteway
+geteway-> bibaboMarketing:网关将请求转发到营销系统
+activate bibaboMarketing
+bibaboMarketing--> mysqlMarketing:将发劵请求落库
+alt 唯一键冲突
+    bibaboMarketing-> geteway:发劵请求失败
+else C端用户不存在发劵记录
+    bibaboMarketing-> activityQueue: 放入活动异步队列
+    bibaboMarketing-> geteway:发劵请求成功
+end
+deactivate bibaboMarketing
+geteway-> front:发劵请求成功
+deactivate geteway
+front-> frontUser:领劵请求成功
+deactivate front
+
+autonumber
+activate activityQueue
+activityQueue-> marketingActivityProcessRunner:异步活动处理
+activate marketingActivityProcessRunner
+alt 不满足活动条件
+marketingActivityProcessRunner-> activityQueue:入放劵队列失败
+else 满足活动条件
+marketingActivityProcessRunner-> grantCouponQueue:放入放劵队列
+marketingActivityProcessRunner-> activityQueue:入放劵队列成功
+end
+deactivate marketingActivityProcessRunner
+deactivate activityQueue
+
+autonumber
+activate grantCouponQueue
+grantCouponQueue-> grantCouponProcessRunner:异步发劵处理，该任务为卡劵系统做精准限流
+activate grantCouponProcessRunner
+grantCouponProcessRunner-> bibaboUser:请求卡劵系统发放劵到用户账户中
+activate bibaboUser
+alt 库存不充足
+bibaboUser-> grantCouponProcessRunner:放劵失败，库存不足
+else
+bibaboUser-> redis:扣减库存
+bibaboUser-> grantCouponProcessRunner:放劵成功到用户账户
+end
+deactivate bibaboUser
+deactivate grantCouponProcessRunner
+deactivate grantCouponQueue
+@enduml
