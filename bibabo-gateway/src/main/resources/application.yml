@@ -25,6 +25,11 @@ spring:
           uri: lb://bibabo-trade
           predicates:
             - Path=/order/**
+        #- id: marketing
+          ###注册中心上拿到的是元数据的端口13089，需要通过元数据端口获取到20880、9090，所以不好使，调不通
+          #uri: lb://bibabo-marketing-service
+          #predicates:
+            #- Path=/activity/**
 
       #超时
       httpclient:

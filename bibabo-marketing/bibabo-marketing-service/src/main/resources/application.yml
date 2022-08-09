@@ -85,27 +85,31 @@ spring:
 dubbo:
   cloud:
     subscribed-services: bibabo-user-service
-  protocol:
-    id: dubbo
-    name: dubbo
-    port: -1
   scan:
     base-packages: com.bibabo.bibabomarketingservice
   provider:
     filter: tracing
+  protocols:
+    dubbo:
+      name: dubbo
+      port: -1
+    rest:
+      name: rest
+      port: 9090
+      server: netty
   consumer:
     filter: tracing
 
 logging:
   level:
     root: info
-    #com:
-     # alibaba:
+      #com:
+      # alibaba:
       #  cloud:
-       #   stream:
-        #    binder:
-         #     rocketmq: DEBUG
-          #nacos:
-           # client: debug
+      #   stream:
+      #    binder:
+      #     rocketmq: DEBUG
+    #nacos:
+    # client: debug
 server:
   port: 10089

@@ -14,6 +14,11 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import java.util.Date;
 
 /**
@@ -22,7 +27,10 @@ import java.util.Date;
  * @Description:
  */
 @Slf4j
-@DubboService
+@DubboService(protocol = {"dubbo", "rest"})
+@Path("/")
+@Produces({MediaType.APPLICATION_JSON + "; " + MediaType.CHARSET_PARAMETER + "=UTF-8"})
+@Consumes({MediaType.APPLICATION_JSON})
 public class MarketingActivityServiceImpl implements MarketingActivityServiceI {
 
     @Autowired
@@ -32,6 +40,8 @@ public class MarketingActivityServiceImpl implements MarketingActivityServiceI {
     private GiftCustRecordRepository giftCustRecordRepository;
 
     @Override
+    @Path("activity")
+    @POST
     public RpcResponseDTO<Boolean> joinActivity(JoinActivityRequestDTO dto) {
 
         if (dto == null || dto.getActivityId() == null || dto.getCustId() == null) {
@@ -49,8 +59,9 @@ public class MarketingActivityServiceImpl implements MarketingActivityServiceI {
         GiftCustRecord giftCustRecordDB = null;
         try {
             giftCustRecordDB = giftCustRecordRepository.save(giftCustRecord);
-        } catch (DuplicateKeyException e) {
-            return RpcResponseDTO.<Boolean>builder().fail("custId" + dto.getCustId() + " has joined activityId " + dto.getActivityId()).build();
+        } catch (Exception e) {
+            log.error("", e);
+            return RpcResponseDTO.<Boolean>builder().fail("custId：" + dto.getCustId() + " has joined activityId：" + dto.getActivityId()).build();
         }
 
         // 发到本地queue中
