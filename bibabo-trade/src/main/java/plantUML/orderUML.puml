@@ -1,0 +1,48 @@
+@startuml
+title 用户下单
+
+actor C端用户
+
+participant "Gateway" as gateway
+participant "bibabo-trade" as bibaboTrade
+participant "bibabo-order-service" as bibaboOrder
+participant "bibabo-stock-service" as bibaboStock
+database "RocketMQ" as rocketMQ
+database "Seata" as seata
+database "Mysql" as mysql
+
+autonumber
+C端用户-> gateway: 用户下单请求网关
+activate gateway
+gateway-> bibaboTrade: 网关请求交易系统
+activate bibaboTrade
+bibaboTrade--> seata: 开启分布式事务
+activate seata
+activate bibaboOrder
+bibaboTrade-> bibaboOrder: 请求订单服务创建订单
+bibaboOrder--> mysql: 创建订单
+bibaboOrder-> bibaboTrade: 返回创建订单结果
+deactivate bibaboOrder
+alt 订单服务创建订单失败
+bibaboTrade--> seata: 回滚事务
+bibaboTrade-> gateway: 创建订单失败
+else 订单服务创建订单成功
+bibaboTrade-> bibaboStock: 请求库存服务扣减库存
+    activate bibaboStock
+    bibaboStock--> mysql: 扣减库存
+    bibaboStock-> bibaboTrade: 返回扣减库存结果
+    deactivate bibaboStock
+    alt 库存服务扣减失败
+    bibaboTrade--> seata: 回滚事务
+    bibaboTrade-> gateway: 创建订单失败
+    else 库存扣减成功
+    bibaboTrade--> seata: 提交事务
+    deactivate seata
+    bibaboTrade--> rocketMQ: 发送支付超时消息。超时消息消费取消订单
+    bibaboTrade-> gateway: 创建订单成功
+    end
+end
+deactivate bibaboTrade
+gateway-> C端用户: 返回创建订单结果
+deactivate gateway
+@enduml

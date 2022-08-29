@@ -1,0 +1,35 @@
+@startuml
+actor 用户支付订单
+
+participant "bibabo-gateway" as bibaboGateway
+participant "bibabo-trade" as bibaboTrade
+participant "bibabo-order" as bibaboOrder
+database "Mysql" as mysql
+database "RocketMq" as rocketMq
+
+autonumber
+用户支付订单-> bibaboGateway: 用户支付订单请求网关
+activate bibaboGateway
+bibaboGateway-> bibaboTrade: 用户支付请求交易系统
+activate bibaboTrade
+bibaboTrade--> rocketMq: 向rocketMq发送事务半消息
+bibaboTrade-> bibaboOrder: 发送支付请求
+activate bibaboOrder
+bibaboOrder--> mysql: 支付修改数据库
+bibaboOrder-> bibaboTrade: 返回支付结果
+deactivate bibaboOrder
+alt 支付成功
+bibaboTrade--> rocketMq: 提交半消息
+bibaboTrade-> bibaboGateway: 支付成功
+else 支付失败
+bibaboTrade-> bibaboGateway: 支付失败
+end
+deactivate bibaboTrade
+bibaboGateway-> 用户支付订单: 返回支付结果
+deactivate bibaboGateway
+
+autonumber
+bibaboOrder--> rocketMq: 消费支付成功事务消息
+bibaboOrder-> bibaboOrder: 处理订单履约流程
+
+@enduml
