@@ -74,7 +74,7 @@ public class QueueWorker {
 
         @Override
         public void run() {
-            while (true) {
+            while (!Thread.currentThread().isInterrupted()) {
                 if (SpringContext.isSpringClosedSignal()) {
                     break;
                 }
@@ -107,6 +107,7 @@ public class QueueWorker {
                     countDownLatch.await();
                 } catch (InterruptedException e) {
                     log.error("worker线程:{}，已执行结束。异常：{}", Thread.currentThread().getName(), e.getMessage(), e);
+                    Thread.currentThread().interrupt();
                 }
             }
             log.info("worker线程:{}，已执行结束", Thread.currentThread().getName());
