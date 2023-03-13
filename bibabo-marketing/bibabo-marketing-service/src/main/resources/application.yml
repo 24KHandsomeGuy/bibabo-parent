@@ -19,7 +19,7 @@ spring:
     nacos:
       discovery:
         namespace: public
-        server-addr: 114.116.44.130:8848
+        server-addr: 82.156.216.254:8848
     stream:
       bindings:
         inputMarketing:
@@ -55,7 +55,7 @@ spring:
     testWhileIdle: true
     timeBetweenEvictionRunsMillis: 60000
     type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql://114.116.44.130:3306/bibabo_marketing?characterEncoding=utf-8&serverTimezone=GMT%2B8
+    url: jdbc:mysql://82.156.216.254:3306/bibabo_marketing?characterEncoding=utf-8&serverTimezone=GMT%2B8
     useGlobalDataSourceStat: true
     validationQuery: SELECT 1 FROM DUAL
   jpa:

@@ -4,7 +4,7 @@ spring:
   cloud:
     nacos:
       config:
-        server-addr: http://114.116.44.130:8848
+        server-addr: http://82.156.216.254:8848
         shared-configs:
           - data-id: ${spring.application.name}.yml
             refresh: true

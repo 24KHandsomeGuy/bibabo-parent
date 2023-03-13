@@ -40,7 +40,7 @@ import java.util.Optional;
  * @description
  */
 @Slf4j
-@DubboService
+@DubboService(protocol = {"dubbo", "rest"})
 public class SkuDubboServiceImpl implements ISkuDubboService {
 
     @Autowired

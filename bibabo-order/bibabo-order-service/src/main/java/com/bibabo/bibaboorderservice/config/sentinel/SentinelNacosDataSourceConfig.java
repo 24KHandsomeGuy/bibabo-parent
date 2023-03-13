@@ -37,9 +37,8 @@ public class SentinelNacosDataSourceConfig {
     @PostConstruct
     private void init() {
         // NacosSource初始化,从Nacos中获取熔断规则
-        sentinelProperties.getDatasource().entrySet().stream().filter(entry -> {
-            return entry.getValue().getNacos() != null && entry.getValue().getNacos().getDataId().contains("flow");
-        }).forEach(entry -> {
+        sentinelProperties.getDatasource().entrySet().stream().filter(entry -> entry.getValue().getNacos() != null && entry.getValue().getNacos().getDataId().contains("flow"))
+                .forEach(entry -> {
             NacosDataSourceProperties nacos = entry.getValue().getNacos();
             ReadableDataSource<String, List<FlowRule>> flowRuleDataSource
                     = new NacosDataSource<>(nacos.getServerAddr(), nacos.getGroupId(), nacos.getDataId(), source -> JSON.parseObject(source, new TypeReference<List<FlowRule>>() {
@@ -50,9 +49,8 @@ public class SentinelNacosDataSourceConfig {
             FlowRuleManager.register2Property(flowRuleDataSource.getProperty());
         });
 
-        sentinelProperties.getDatasource().entrySet().stream().filter(entry -> {
-            return entry.getValue().getNacos() != null && entry.getValue().getNacos().getDataId().contains("degrade");
-        }).forEach(entry -> {
+        sentinelProperties.getDatasource().entrySet().stream().filter(entry -> entry.getValue().getNacos() != null && entry.getValue().getNacos().getDataId().contains("degrade"))
+                .forEach(entry -> {
             NacosDataSourceProperties nacos = entry.getValue().getNacos();
             ReadableDataSource<String, List<DegradeRule>> degradeRuleDataSource
                     = new NacosDataSource<>(nacos.getServerAddr(), nacos.getGroupId(), nacos.getDataId(), source -> JSON.parseObject(source, new TypeReference<List<DegradeRule>>() {

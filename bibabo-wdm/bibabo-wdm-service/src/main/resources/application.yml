@@ -7,7 +7,7 @@ spring:
     nacos:
       discovery:
         namespace: public
-        server-addr: 114.116.44.130:8848
+        server-addr: 82.156.216.254:8848
   datasource:
     connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=500
     driver-class-name: com.mysql.jdbc.Driver
@@ -26,7 +26,7 @@ spring:
     testWhileIdle: true
     timeBetweenEvictionRunsMillis: 60000
     type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql://114.116.44.130:3306/bibabo_wdm?characterEncoding=utf-8&serverTimezone=GMT%2B8
+    url: jdbc:mysql://82.156.216.254:3306/bibabo_wdm?characterEncoding=utf-8&serverTimezone=GMT%2B8
     useGlobalDataSourceStat: true
     validationQuery: SELECT 1 FROM DUAL
   jpa:
@@ -51,10 +51,14 @@ spring:
 dubbo:
   cloud:
     subscribed-services: bibabo-wdm-service
-  protocol:
-    id: dubbo
-    name: dubbo
-    port: -1
+  protocols:
+    rest:
+      name: rest
+      post: 8888
+      server: jetty
+    dubbo:
+      name: dubbo
+      port: -1
   scan:
     base-packages: com.bibabo.bibabowdmservice
   provider:

@@ -5,7 +5,7 @@ spring:
     nacos:
       discovery:
         namespace: public
-        server-addr: 114.116.44.130:8848
+        server-addr: 82.156.216.254:8848
 
     stream:
       bindings:
@@ -33,12 +33,12 @@ spring:
     sentinel:
       ## 公司内网，sentinel控制台无法访问推送
       transport:
-        port: 8719
-        dashboard: 114.116.44.130:9090
+        port: 8720
+        dashboard: 82.156.216.254:9090
       datasource:
         order-flow:
           nacos:
-            server-addr: 114.116.44.130:8848
+            server-addr: 82.156.216.254:8848
             data-id: ${spring.application.name}-flow-rules
             username: nacos
             password: nacos
@@ -46,7 +46,7 @@ spring:
             ruleType: flow
         order-degrade:
           nacos:
-            server-addr: 114.116.44.130:8848
+            server-addr: 82.156.216.254:8848
             data-id: ${spring.application.name}-degrade-rules
             username: nacos
             password: nacos
@@ -85,7 +85,7 @@ spring:
     testWhileIdle: true
     timeBetweenEvictionRunsMillis: 60000
     type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql://114.116.44.130:3306/bibabo_order?characterEncoding=utf-8&serverTimezone=GMT%2B8
+    url: jdbc:mysql://82.156.216.254:3306/bibabo_order?characterEncoding=utf-8&serverTimezone=GMT%2B8
     useGlobalDataSourceStat: true
     validationQuery: SELECT 1 FROM DUAL
   jpa:
@@ -121,7 +121,7 @@ seata:
   config:
     type: nacos
     nacos:
-      server-addr: 114.116.44.130:8848
+      server-addr: 82.156.216.254:8848
       group: BIBABO_SEATA_GROUP
       username: nacos
       password: nacos
