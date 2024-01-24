@@ -1,0 +1,5 @@
+ab:
+  experiment:
+    configs: '[{"experimentId":1,"experimentName":"首页扫一扫按钮颜色实验","flow":100,"layerId":1,"versionConfigs":[{"flow":50,"version":1,"data":{"buttonColor":"#000000"}},{"data":{"buttonColor":"#ffffff"},"flow":50,"version":2}]},{"experimentId":2,"experimentName":"搜索分类页10%用户走改版实验","flow":100,"layerId":1,"versionConfigs":[{"flow":90,"version":1,"data":true},{"flow":10,"version":2,"data":false}]}]'
+  rule:
+    configs: '[{"divRule":{"percent":100},"domain":{"id":1,"name":"首页实验域"},"grayRules":[{"enabled":true,"global":true,"include":[10086, 10010],"name":"userId"},{"enabled":true,"global":true,"include":[85],"name":"storeId"}]},{"divRule":{"percent":100},"domain":{"id":2,"name":"搜索分类页改版实验域"},"grayRules":[{"enabled":true,"global":false,"include":[1,2,85,86,70121],"name":"venderId"},{"enabled":true,"global":true,"include":[],"name":"storeId"}]}]'
