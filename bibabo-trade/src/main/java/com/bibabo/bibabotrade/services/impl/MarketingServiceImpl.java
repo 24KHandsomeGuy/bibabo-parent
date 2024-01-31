@@ -3,7 +3,7 @@ package com.bibabo.bibabotrade.services.impl;
 import com.bibabo.bibabotrade.services.MarketingServicel;
 import com.bibabo.marketing.dto.JoinActivityRequestDTO;
 import com.bibabo.marketing.services.MarketingActivityServiceI;
-import com.bibabo.utils.model.RpcResponseDTO;
+import com.bibabo.utils.model.ResponseDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,7 @@ public class MarketingServiceImpl implements MarketingServicel {
     private MarketingActivityServiceI marketingActivityService;
 
     @Override
-    public RpcResponseDTO<Boolean> joinActivity(JoinActivityRequestDTO requestDTO) {
+    public ResponseDTO<Boolean> joinActivity(JoinActivityRequestDTO requestDTO) {
         return marketingActivityService.joinActivity(requestDTO);
     }
 

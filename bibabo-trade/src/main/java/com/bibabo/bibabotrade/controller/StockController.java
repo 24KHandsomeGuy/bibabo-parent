@@ -3,7 +3,7 @@ package com.bibabo.bibabotrade.controller;
 import com.bibabo.bibabotrade.services.QueryStockNumServiceI;
 import com.bibabo.stock.dto.StockReqeustDTO;
 import com.bibabo.stock.dto.StockResponseDTO;
-import com.bibabo.utils.model.RpcResponseDTO;
+import com.bibabo.utils.model.ResponseDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,11 +30,11 @@ public class StockController {
 
 
     @GetMapping("/stock")
-    public RpcResponseDTO<StockResponseDTO> getStockNum(@RequestParam String skuIds) {
+    public ResponseDTO<StockResponseDTO> getStockNum(@RequestParam String skuIds) {
         log.info("getStockNum interface receives request paramter : {}", skuIds);
 
         if (StringUtils.isBlank(skuIds)) {
-            return RpcResponseDTO.<StockResponseDTO>builder().fail("请求参数为空").build();
+            return ResponseDTO.<StockResponseDTO>builder().fail("请求参数为空").build();
         }
 
         List<StockReqeustDTO> stockReqeustDTOList = new ArrayList<>();
@@ -45,6 +45,6 @@ public class StockController {
         });
         List<StockResponseDTO> stockResponseDTOList = queryStockNumService.getStock(stockReqeustDTOList);
 
-        return RpcResponseDTO.<StockResponseDTO>builder().success(stockResponseDTOList).build();
+        return ResponseDTO.<StockResponseDTO>builder().success(stockResponseDTOList).build();
     }
 }

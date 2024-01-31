@@ -1,7 +1,7 @@
 package com.bibabo.user.services;
 
 import com.bibabo.user.dto.GrantCouponRequestDTO;
-import com.bibabo.utils.model.RpcResponseDTO;
+import com.bibabo.utils.model.ResponseDTO;
 
 /**
  * @Author: Damon Fu
@@ -10,5 +10,5 @@ import com.bibabo.utils.model.RpcResponseDTO;
  */
 public interface GrantCouponService {
     
-    RpcResponseDTO grantCoupon(GrantCouponRequestDTO dto);
+    ResponseDTO grantCoupon(GrantCouponRequestDTO dto);
 }

@@ -12,7 +12,7 @@ import com.bibabo.order.dto.OrderModel;
 import com.bibabo.order.dto.OrderRequestDTO;
 import com.bibabo.order.dto.OrderResponseDTO;
 import com.bibabo.order.services.OrderServiceI;
-import com.bibabo.utils.model.RpcResponseDTO;
+import com.bibabo.utils.model.ResponseDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -181,16 +181,16 @@ public class OrderServiceImpl implements OrderServiceI {
 
 
     @Override
-    public RpcResponseDTO<OrderAddressInfoDTO> queryOrderAddress(long orderId) {
+    public ResponseDTO<OrderAddressInfoDTO> queryOrderAddress(long orderId) {
         RBucket<String> addressRBucket = redissonClient.getBucket(RedisPrefixEnum.splicingRedisKey(RedisPrefixEnum.ORDER_ADDRESS, orderId));
         String address = addressRBucket.get();
         if (address == null) {
             OrderMain om = orderMainService.findByOrderId(orderId);
             if (om == null) {
-                return RpcResponseDTO.<OrderAddressInfoDTO>builder().fail("订单号" + orderId + "不存在").build();
+                return ResponseDTO.<OrderAddressInfoDTO>builder().fail("订单号" + orderId + "不存在").build();
             }
             if (om.getCustAddress() == null) {
-                return RpcResponseDTO.<OrderAddressInfoDTO>builder().fail("订单号" + orderId + "地址为空").build();
+                return ResponseDTO.<OrderAddressInfoDTO>builder().fail("订单号" + orderId + "地址为空").build();
             }
             address = om.getCustAddress();
             addressRBucket.set(address, RedisPrefixEnum.ORDER_ADDRESS.getExpireSeconds(), TimeUnit.SECONDS);
@@ -198,20 +198,20 @@ public class OrderServiceImpl implements OrderServiceI {
         OrderAddressInfoDTO dto = new OrderAddressInfoDTO();
         dto.setOrderId(orderId);
         dto.setCustAddress(address);
-        return RpcResponseDTO.<OrderAddressInfoDTO>builder().success(dto).build();
+        return ResponseDTO.<OrderAddressInfoDTO>builder().success(dto).build();
     }
 
 
     @Override
-    public RpcResponseDTO updateOrderAddress(OrderAddressInfoDTO dto) {
+    public ResponseDTO updateOrderAddress(OrderAddressInfoDTO dto) {
         if (dto == null || dto.getOrderId() == null || dto.getCustAddress() == null) {
-            return RpcResponseDTO.builder().fail("修改订单地址参数为空").build();
+            return ResponseDTO.builder().fail("修改订单地址参数为空").build();
         }
         // 修改地址后需要删除key，以保证读到的是最新值，交由Canal做
         int rst = orderMainService.updateOrderAddress(dto.getOrderId(), dto.getCustAddress());
         if (rst <= 0) {
-            return RpcResponseDTO.builder().fail("订单号" + dto.getOrderId() + "地址修改失败").build();
+            return ResponseDTO.builder().fail("订单号" + dto.getOrderId() + "地址修改失败").build();
         }
-        return RpcResponseDTO.builder().success().build();
+        return ResponseDTO.builder().success().build();
     }
 }

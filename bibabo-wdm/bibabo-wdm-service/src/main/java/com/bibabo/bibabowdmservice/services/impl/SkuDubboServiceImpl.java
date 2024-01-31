@@ -1,26 +1,20 @@
 package com.bibabo.bibabowdmservice.services.impl;
 
 import com.bibabo.bibabowdmservice.domain.SkuMain;
-import com.bibabo.bibabowdmservice.model.enums.ElasticsearchIndexEnum;
 import com.bibabo.bibabowdmservice.services.ISkuMainService;
-import com.bibabo.utils.model.RpcResponseDTO;
+import com.bibabo.utils.model.ResponseDTO;
 import com.bibabo.wdm.dto.SkuQueryRequest;
 import com.bibabo.wdm.dto.SkuQueryResponse;
 import com.bibabo.wdm.services.ISkuDubboService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.elasticsearch.action.bulk.BulkRequest;
-import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.unit.Fuzziness;
-import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -28,7 +22,6 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -72,21 +65,21 @@ public class SkuDubboServiceImpl implements ISkuDubboService {
 
     @SneakyThrows
     @Override
-    public RpcResponseDTO<SkuQueryResponse> findSkuByConditions(SkuQueryRequest skuQueryRequest) {
+    public ResponseDTO<SkuQueryResponse> findSkuByConditions(SkuQueryRequest skuQueryRequest) {
         // skuId读单个
         if (skuQueryRequest.getSkuId() != null) {
             Optional<SkuMain> optionalSkuMain = skuMainService.findById(skuQueryRequest.getSkuId());
             SkuMain skuMain = optionalSkuMain.orElse(null);
             if (skuMain == null) {
-                return RpcResponseDTO.<SkuQueryResponse>builder().fail(skuQueryRequest.getSkuId() + "不存在").build();
+                return ResponseDTO.<SkuQueryResponse>builder().fail(skuQueryRequest.getSkuId() + "不存在").build();
             }
             SkuQueryResponse response = new SkuQueryResponse();
             BeanUtils.copyProperties(skuMain, response);
-            return RpcResponseDTO.<SkuQueryResponse>builder().success(response).build();
+            return ResponseDTO.<SkuQueryResponse>builder().success(response).build();
         }
 
         if (skuQueryRequest.getSkuName() == null) {
-            return RpcResponseDTO.<SkuQueryResponse>builder().fail("传参为空").build();
+            return ResponseDTO.<SkuQueryResponse>builder().fail("传参为空").build();
         }
 
         // skuName从ES读批量
@@ -109,6 +102,6 @@ public class SkuDubboServiceImpl implements ISkuDubboService {
             skuQueryResponseList.add(skuQueryResponse);
         }
 
-        return RpcResponseDTO.<SkuQueryResponse>builder().success(skuQueryResponseList).build();
+        return ResponseDTO.<SkuQueryResponse>builder().success(skuQueryResponseList).build();
     }
 }

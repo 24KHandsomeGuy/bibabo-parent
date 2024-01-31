@@ -1,7 +1,7 @@
 package com.bibabo.marketing.services;
 
 import com.bibabo.marketing.dto.JoinActivityRequestDTO;
-import com.bibabo.utils.model.RpcResponseDTO;
+import com.bibabo.utils.model.ResponseDTO;
 
 /**
  * @Author: Damon Fu
@@ -16,5 +16,5 @@ public interface MarketingActivityServiceI {
      * @param dto
      * @return
      */
-    RpcResponseDTO<Boolean> joinActivity(JoinActivityRequestDTO dto);
+    ResponseDTO<Boolean> joinActivity(JoinActivityRequestDTO dto);
 }

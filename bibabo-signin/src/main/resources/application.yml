@@ -1,0 +1,13 @@
+spring:
+  redis:
+    redisson:
+      config: |
+        singleServerConfig:
+          address: redis://39.107.156.177:6379
+          database: 13
+          password: 123456
+          subscriptionConnectionPoolSize: 2
+          connectionMinimumIdleSize: 2
+          connectionPoolSize: 4
+server:
+  port: 8097

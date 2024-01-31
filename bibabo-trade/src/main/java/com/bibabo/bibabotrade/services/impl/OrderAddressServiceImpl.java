@@ -2,7 +2,7 @@ package com.bibabo.bibabotrade.services.impl;
 
 import com.bibabo.bibabotrade.services.OrderAddressServiceI;
 import com.bibabo.order.dto.OrderAddressInfoDTO;
-import com.bibabo.utils.model.RpcResponseDTO;
+import com.bibabo.utils.model.ResponseDTO;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.stereotype.Service;
 
@@ -20,12 +20,12 @@ public class OrderAddressServiceImpl implements OrderAddressServiceI {
 
 
     @Override
-    public RpcResponseDTO<OrderAddressInfoDTO> queryOrderAddress(long orderId) {
+    public ResponseDTO<OrderAddressInfoDTO> queryOrderAddress(long orderId) {
         return orderService.queryOrderAddress(orderId);
     }
 
     @Override
-    public RpcResponseDTO updateOrderAddress(OrderAddressInfoDTO dto) {
+    public ResponseDTO updateOrderAddress(OrderAddressInfoDTO dto) {
         return orderService.updateOrderAddress(dto);
     }
 }

@@ -2,7 +2,7 @@ package com.bibabo.bibabotrade.controller;
 
 import com.bibabo.bibabotrade.services.MarketingServicel;
 import com.bibabo.marketing.dto.JoinActivityRequestDTO;
-import com.bibabo.utils.model.RpcResponseDTO;
+import com.bibabo.utils.model.ResponseDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,7 +22,7 @@ public class MarketingController {
     private MarketingServicel marketingService;
 
     @PostMapping("/activity")
-    public RpcResponseDTO<Boolean> joinActivity(@RequestBody JoinActivityRequestDTO dto) {
+    public ResponseDTO<Boolean> joinActivity(@RequestBody JoinActivityRequestDTO dto) {
         log.info("join activity receive request parameter:{}", dto);
         return marketingService.joinActivity(dto);
     }

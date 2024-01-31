@@ -1,6 +1,6 @@
 package com.bibabo.wdm.services;
 
-import com.bibabo.utils.model.RpcResponseDTO;
+import com.bibabo.utils.model.ResponseDTO;
 import com.bibabo.wdm.dto.SkuQueryRequest;
 import com.bibabo.wdm.dto.SkuQueryResponse;
 
@@ -18,5 +18,5 @@ public interface ISkuDubboService {
 
     @POST
     @Path("/product")
-    RpcResponseDTO<SkuQueryResponse> findSkuByConditions(SkuQueryRequest skuQueryRequest);
+    ResponseDTO<SkuQueryResponse> findSkuByConditions(SkuQueryRequest skuQueryRequest);
 }

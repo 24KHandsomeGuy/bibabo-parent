@@ -8,11 +8,10 @@ import com.bibabo.bibabomarketingservice.model.enums.ProcessorEnum;
 import com.bibabo.bibabomarketingservice.queue.QueueManager;
 import com.bibabo.marketing.dto.JoinActivityRequestDTO;
 import com.bibabo.marketing.services.MarketingActivityServiceI;
-import com.bibabo.utils.model.RpcResponseDTO;
+import com.bibabo.utils.model.ResponseDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -42,10 +41,10 @@ public class MarketingActivityServiceImpl implements MarketingActivityServiceI {
     @Override
     @Path("activity")
     @POST
-    public RpcResponseDTO<Boolean> joinActivity(JoinActivityRequestDTO dto) {
+    public ResponseDTO<Boolean> joinActivity(JoinActivityRequestDTO dto) {
 
         if (dto == null || dto.getActivityId() == null || dto.getCustId() == null) {
-            return RpcResponseDTO.<Boolean>builder().fail("入参为空").build();
+            return ResponseDTO.<Boolean>builder().fail("入参为空").build();
         }
 
         // 落库
@@ -61,12 +60,12 @@ public class MarketingActivityServiceImpl implements MarketingActivityServiceI {
             giftCustRecordDB = giftCustRecordRepository.save(giftCustRecord);
         } catch (Exception e) {
             log.error("", e);
-            return RpcResponseDTO.<Boolean>builder().fail("custId：" + dto.getCustId() + " has joined activityId：" + dto.getActivityId()).build();
+            return ResponseDTO.<Boolean>builder().fail("custId：" + dto.getCustId() + " has joined activityId：" + dto.getActivityId()).build();
         }
 
         // 发到本地queue中
         boolean rst = queueManager.getBlockingQueue(ProcessorEnum.ACTIVITY.getName()).offer(ActivityDTO.builder().activityId(dto.getActivityId()).custId(dto.getCustId()).giftRecordId(giftCustRecordDB.getId()).build());
         log.info("activity Id:{}, cust id:{}, push to local queue:{}, result:{}", dto.getActivityId(), dto.getCustId(), ProcessorEnum.ACTIVITY.getName(), rst);
-        return RpcResponseDTO.<Boolean>builder().success(rst).build();
+        return ResponseDTO.<Boolean>builder().success(rst).build();
     }
 }

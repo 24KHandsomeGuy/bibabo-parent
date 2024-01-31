@@ -1,6 +1,6 @@
 package com.bibabo.bibabotrade.controller;
 
-import com.bibabo.utils.model.RpcResponseDTO;
+import com.bibabo.utils.model.ResponseDTO;
 import com.bibabo.wdm.dto.SkuQueryRequest;
 import com.bibabo.wdm.dto.SkuQueryResponse;
 import com.bibabo.wdm.services.ISkuDubboService;
@@ -25,14 +25,14 @@ public class WdmController {
 
 
     @GetMapping("/sku/{skuId}")
-    public RpcResponseDTO<SkuQueryResponse> getSkuInfoById(@PathVariable long skuId) {
+    public ResponseDTO<SkuQueryResponse> getSkuInfoById(@PathVariable long skuId) {
         SkuQueryRequest request = new SkuQueryRequest();
         request.setSkuId(skuId);
         return skuDubboService.findSkuByConditions(request);
     }
 
     @GetMapping("/sku")
-    public RpcResponseDTO<SkuQueryResponse> getSkuInfosByName(@RequestParam String skuName, @RequestParam Integer from, @RequestParam Integer size) {
+    public ResponseDTO<SkuQueryResponse> getSkuInfosByName(@RequestParam String skuName, @RequestParam Integer from, @RequestParam Integer size) {
         SkuQueryRequest request = new SkuQueryRequest();
         request.setSkuName(skuName);
         request.setFrom(from);

@@ -5,7 +5,7 @@ import com.bibabo.bibabomarketingservice.queue.strategy.DispatchStrategy;
 import com.bibabo.bibabomarketingservice.queue.strategy.GrantCouponDispatchStrategy;
 import com.bibabo.user.dto.GrantCouponRequestDTO;
 import com.bibabo.user.services.GrantCouponService;
-import com.bibabo.utils.model.RpcResponseDTO;
+import com.bibabo.utils.model.ResponseDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -30,7 +30,7 @@ public class GrantCouponProcessRunner extends ProcessRunner {
         log.info("GrantCouponProcessRunner receive element:{}", element);
         ActivityDTO activityDTO = (ActivityDTO) getElement();
         GrantCouponRequestDTO requestDTO = new GrantCouponRequestDTO(activityDTO.getCouponId(), activityDTO.getCustId());
-        RpcResponseDTO responseDTO = grantCouponService.grantCoupon(requestDTO);
+        ResponseDTO responseDTO = grantCouponService.grantCoupon(requestDTO);
         if (responseDTO.getSuccess()) {
             log.info("cust id:{} is suit activity Id:{}, grant coupon id:{} success", activityDTO.getCustId(), activityDTO.getActivityId(), activityDTO.getCouponId());
             // 发劵成功

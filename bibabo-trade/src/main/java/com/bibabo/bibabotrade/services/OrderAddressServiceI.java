@@ -1,7 +1,7 @@
 package com.bibabo.bibabotrade.services;
 
 import com.bibabo.order.dto.OrderAddressInfoDTO;
-import com.bibabo.utils.model.RpcResponseDTO;
+import com.bibabo.utils.model.ResponseDTO;
 
 /**
  * @author fukuixiang
@@ -17,7 +17,7 @@ public interface OrderAddressServiceI {
      * @param orderId
      * @return
      */
-    RpcResponseDTO<OrderAddressInfoDTO> queryOrderAddress(long orderId);
+    ResponseDTO<OrderAddressInfoDTO> queryOrderAddress(long orderId);
 
     /**
      * 修改订单地址，用于Redis缓存试验
@@ -25,5 +25,5 @@ public interface OrderAddressServiceI {
      * @param dto
      * @return
      */
-    RpcResponseDTO updateOrderAddress(OrderAddressInfoDTO dto);
+    ResponseDTO updateOrderAddress(OrderAddressInfoDTO dto);
 }

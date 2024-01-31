@@ -12,7 +12,7 @@ import com.bibabo.bibabotrade.utils.NumberGenerator;
 import com.bibabo.bibabotrade.utils.RedisRateLimiterEnum;
 import com.bibabo.order.dto.OrderAddressInfoDTO;
 import com.bibabo.order.dto.OrderModel;
-import com.bibabo.utils.model.RpcResponseDTO;
+import com.bibabo.utils.model.ResponseDTO;
 import com.bibabo.utils.monitor.Profiler;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RRateLimiter;
@@ -137,27 +137,27 @@ public class OrderController {
 
 
     @GetMapping("/order/address")
-    public RpcResponseDTO getOrderAddress(@RequestParam long orderId) {
+    public ResponseDTO getOrderAddress(@RequestParam long orderId) {
         log.info("交易系统接收前端查询订单地址请求参数：{} ", orderId);
-        RpcResponseDTO responseDTO = orderAddressService.queryOrderAddress(orderId);
+        ResponseDTO responseDTO = orderAddressService.queryOrderAddress(orderId);
         log.info("交易系统接收前端查询订单地址请求参数：{} 响应结果：{}", orderId, responseDTO);
         return responseDTO;
     }
 
 
     @PutMapping("/order/address")
-    public RpcResponseDTO updateOrderAddress(@RequestBody OrderAO orderAO) {
+    public ResponseDTO updateOrderAddress(@RequestBody OrderAO orderAO) {
         log.info("交易系统接收前端修改订单地址请求参数：{} ", orderAO);
 
         // 懒得转VO了
         if (orderAO.getOrderId() == null) {
-            return RpcResponseDTO.builder().fail(String.format("参数校验，orderId不可以为空%s", orderAO)).build();
+            return ResponseDTO.builder().fail(String.format("参数校验，orderId不可以为空%s", orderAO)).build();
         }
 
         OrderAddressInfoDTO dto = new OrderAddressInfoDTO();
         dto.setOrderId(orderAO.getOrderId());
         dto.setCustAddress(orderAO.getAddress());
-        RpcResponseDTO responseDTO = orderAddressService.updateOrderAddress(dto);
+        ResponseDTO responseDTO = orderAddressService.updateOrderAddress(dto);
         log.info("交易系统接收前端修改订单地址请求参数：{} 响应结果：{}", orderAO, responseDTO);
         return responseDTO;
     }

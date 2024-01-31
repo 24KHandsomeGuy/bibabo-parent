@@ -12,7 +12,7 @@ import java.util.List;
  * @time 11:12
  * @description Rpc响应传输对象
  */
-public class RpcResponseDTO<T> implements Serializable {
+public class ResponseDTO<T> implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -24,10 +24,10 @@ public class RpcResponseDTO<T> implements Serializable {
 
     private List<T> dataList;
 
-    public RpcResponseDTO() {
+    public ResponseDTO() {
     }
 
-    public RpcResponseDTO(Boolean success, String message, T data, List<T> dataList) {
+    public ResponseDTO(Boolean success, String message, T data, List<T> dataList) {
         this.success = success;
         this.message = message;
         this.data = data;
@@ -66,8 +66,8 @@ public class RpcResponseDTO<T> implements Serializable {
         this.dataList = dataList;
     }
 
-    public static <T> RpcResponseDTO.Builder<T> builder() {
-        return new RpcResponseDTO.Builder<T>();
+    public static <T> ResponseDTO.Builder<T> builder() {
+        return new ResponseDTO.Builder<T>();
     }
 
     /**
@@ -126,8 +126,8 @@ public class RpcResponseDTO<T> implements Serializable {
             return this;
         }
 
-        public RpcResponseDTO<T> build() {
-            return new RpcResponseDTO<T>(success, message, data, dataList);
+        public ResponseDTO<T> build() {
+            return new ResponseDTO<T>(success, message, data, dataList);
         }
     }
 }

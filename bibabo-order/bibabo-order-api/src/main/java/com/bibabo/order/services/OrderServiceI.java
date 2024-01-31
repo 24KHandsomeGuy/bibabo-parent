@@ -4,7 +4,7 @@ import com.bibabo.order.dto.OrderAddressInfoDTO;
 import com.bibabo.order.dto.OrderModel;
 import com.bibabo.order.dto.OrderRequestDTO;
 import com.bibabo.order.dto.OrderResponseDTO;
-import com.bibabo.utils.model.RpcResponseDTO;
+import com.bibabo.utils.model.ResponseDTO;
 
 /**
  * @Author: Damon Fu
@@ -25,7 +25,7 @@ public interface OrderServiceI {
      * @param orderId
      * @return
      */
-    RpcResponseDTO<OrderAddressInfoDTO> queryOrderAddress(long orderId);
+    ResponseDTO<OrderAddressInfoDTO> queryOrderAddress(long orderId);
 
     /**
      * 修改订单地址，用于Redis缓存试验
@@ -33,5 +33,5 @@ public interface OrderServiceI {
      * @param dto
      * @return
      */
-    RpcResponseDTO updateOrderAddress(OrderAddressInfoDTO dto);
+    ResponseDTO updateOrderAddress(OrderAddressInfoDTO dto);
 }

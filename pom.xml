@@ -21,6 +21,7 @@
         <module>bibabo-marketing</module>
         <module>bibabo-user</module>
         <module>bibabo-abtest</module>
+        <module>bibabo-signin</module>
     </modules>
 
     <properties>
